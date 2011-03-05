@@ -8,6 +8,7 @@
 <script type="text/javascript" src="webgl-utils.js"></script>
 <script type="text/javascript" src="webgl-core.js"></script>
 <script type="text/javascript" src="actor.js"></script>
+<script type="text/javascript" src="world.js"></script>
 
 <script type="text/javascript">
 
@@ -27,11 +28,14 @@
 
 	function initTextures() {
 		textures["player"] = loadTexture("textures/char.png");
+		textures["floor"] = loadTexture("textures/floor.jpg");
+		textures["wall"] = loadTexture("textures/wall.jpg");
 	}
 
 	// Objects etc.
 
 	var player;
+	var world;
 
 	// Key handling
 
@@ -61,7 +65,7 @@
 
 	// Rendering
 
-	var cameraHeight = -10.0;
+	var cameraHeight = -8.0;
 	var cameraPos = vec3.create([0, 0, cameraHeight]);
 
 	function drawScene() {
@@ -87,6 +91,8 @@
 		vec3.lerp(cameraPos, player.pos, 0.1);
 		cameraPos[2] = cameraHeight; // Constant height
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
+
+		world.draw();
 
 		player.draw();
 		dummy2.draw();
@@ -130,6 +136,8 @@
 		player = new Actor("player", [0, 0, 0], textures["player"]);
 		dummy1 = new Actor("player", [-1, 0, 0], textures["player"]);
 		dummy2 = new Actor("player", [0, 1, 0], textures["player"]);
+
+		world = new World();
 
 		tick();
 	}
