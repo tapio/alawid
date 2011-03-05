@@ -50,6 +50,8 @@
 	}
 
 	function handleKeys() {
+		var oldpos = vec3.create(player.pos);
+
 		if (pressedKeys[37] || pressedKeys[65]) { // Left cursor key or A
 			vec3.add(player.pos, [-0.1, 0, 0]);
 		} else if (pressedKeys[39] || pressedKeys[68]) { // Right cursor key or D
@@ -61,6 +63,8 @@
 		} else if (pressedKeys[40] || pressedKeys[83]) { // Down cursor key
 			vec3.add(player.pos, [0, -0.1, 0]);
 		}
+
+		if (world.isWall(player.pos)) player.pos = oldpos;
 	}
 
 	// Rendering

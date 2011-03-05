@@ -148,10 +148,15 @@ function World() {
 				}
 			}
 		}
-		console.log(vertices.length);
 		this.wallBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
 	}
-	this.createWallBuffer([
+
+	this.setLevel = function(data) {
+		this.levelData = data;
+		this.createWallBuffer(data);
+	}
+
+	this.setLevel([
 		"##########",
 		"# #      #",
 		"#  ##    #",
@@ -163,6 +168,20 @@ function World() {
 		"#  #     #",
 		"##########"
 		]);
+
+	this.isWall = function(pos) {
+		const margin = 0.3;
+		var xx = [pos[0] - margin, pos[0] + margin, pos[0] - margin, pos[0] + margin];
+		var yy = [pos[1] - margin, pos[1] - margin, pos[1] + margin, pos[1] + margin];
+		for (var i = 0; i < xx.length; ++i) {
+			var x = Math.round(xx[i]), y = Math.round(yy[i]);
+			if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
+				return true;
+			var c = this.levelData[y][x];
+			if (c != " ") return true;
+		}
+		return false;
+	}
 
 	this.draw = function() {
 		gl.activeTexture(gl.TEXTURE0);
