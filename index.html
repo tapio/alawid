@@ -82,7 +82,9 @@
 		}
 
 	}
-
+	
+	var cube;
+	var moon;
 	var moonAngle = 180;
 	var cubeAngle = 0;
 
@@ -125,39 +127,18 @@
 		gl.bindTexture(gl.TEXTURE_2D, moonTexture);
 		gl.uniform1i(curProg.samplerUniform, 0);
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexPositionBuffer);
-		gl.vertexAttribPointer(curProg.vertexPositionAttribute, moonVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
-		gl.vertexAttribPointer(curProg.textureCoordAttribute, moonVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexNormalBuffer);
-		gl.vertexAttribPointer(curProg.vertexNormalAttribute, moonVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
-		setMatrixUniforms();
-		gl.drawElements(gl.TRIANGLES, moonVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+		moon.draw();
 		mvPopMatrix();
 
 		mvPushMatrix();
 		mat4.rotate(mvMatrix, degToRad(cubeAngle), [0, 1, 0]);
 		mat4.translate(mvMatrix, [1.25, 0, 0]);
-		gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
-		gl.vertexAttribPointer(curProg.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexNormalBuffer);
-		gl.vertexAttribPointer(curProg.vertexNormalAttribute, cubeVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
-		gl.vertexAttribPointer(curProg.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, crateTexture);
 		gl.uniform1i(curProg.samplerUniform, 0);
 
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-		setMatrixUniforms();
-		gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+		cube.draw();
 		mvPopMatrix();
 	}
 

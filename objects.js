@@ -1,21 +1,51 @@
+
 function degToRad(degrees) {
 	return degrees * Math.PI / 180;
 }
 
+/// Vetex buffer object capable of drawing itself
+function VertexBuffer(vertices, texcoords, normals, indices) {
+	this.positionBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+	this.positionBuffer.itemSize = 3;
+	this.positionBuffer.numItems = vertices.length / 3;
 
-var cubeVertexPositionBuffer;
-var cubeVertexNormalBuffer;
-var cubeVertexTextureCoordBuffer;
-var cubeVertexIndexBuffer;
+	this.texcoordBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.texcoordBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texcoords), gl.STATIC_DRAW);
+	this.texcoordBuffer.itemSize = 2;
+	this.texcoordBuffer.numItems = texcoords.length / 2;
 
-var moonVertexPositionBuffer;
-var moonVertexNormalBuffer;
-var moonVertexTextureCoordBuffer;
-var moonVertexIndexBuffer;
+	this.normalBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+	this.normalBuffer.itemSize = 3;
+	this.normalBuffer.numItems = normals.length / 3;
+
+	this.indexBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+	this.indexBuffer.itemSize = 1;
+	this.indexBuffer.numItems = indices.length;
+
+	this.draw = function() {
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+		gl.vertexAttribPointer(curProg.vertexPositionAttribute, this.positionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.texcoordBuffer);
+		gl.vertexAttribPointer(curProg.textureCoordAttribute, this.texcoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+		gl.vertexAttribPointer(curProg.vertexNormalAttribute, this.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+		setMatrixUniforms();
+		gl.drawElements(gl.TRIANGLES, this.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+	}
+}
 
 function initBuffers() {
-	cubeVertexPositionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
 	vertices = [
 		// Front face
 		-1.0, -1.0,  1.0,
@@ -53,13 +83,7 @@ function initBuffers() {
 		-1.0,  1.0,  1.0,
 		-1.0,  1.0, -1.0,
 	];
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-	cubeVertexPositionBuffer.itemSize = 3;
-	cubeVertexPositionBuffer.numItems = 24;
-
-	cubeVertexNormalBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexNormalBuffer);
-	var vertexNormals = [
+	var normals = [
 		// Front face
 		 0.0,  0.0,  1.0,
 		 0.0,  0.0,  1.0,
@@ -96,13 +120,7 @@ function initBuffers() {
 		-1.0,  0.0,  0.0,
 		-1.0,  0.0,  0.0,
 	];
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
-	cubeVertexNormalBuffer.itemSize = 3;
-	cubeVertexNormalBuffer.numItems = 24;
-
-	cubeVertexTextureCoordBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
-	var textureCoords = [
+	var texcoords = [
 		// Front face
 		0.0, 0.0,
 		1.0, 0.0,
@@ -139,13 +157,7 @@ function initBuffers() {
 		1.0, 1.0,
 		0.0, 1.0,
 	];
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-	cubeVertexTextureCoordBuffer.itemSize = 2;
-	cubeVertexTextureCoordBuffer.numItems = 24;
-
-	cubeVertexIndexBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-	var cubeVertexIndices = [
+	var indices = [
 		0, 1, 2,      0, 2, 3,    // Front face
 		4, 5, 6,      4, 6, 7,    // Back face
 		8, 9, 10,     8, 10, 11,  // Top face
@@ -153,10 +165,8 @@ function initBuffers() {
 		16, 17, 18,   16, 18, 19, // Right face
 		20, 21, 22,   20, 22, 23  // Left face
 	];
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-	cubeVertexIndexBuffer.itemSize = 1;
-	cubeVertexIndexBuffer.numItems = 36;
 
+	cube = new VertexBuffer(vertices, texcoords, normals, indices);
 
 	var latitudeBands = 30;
 	var longitudeBands = 30;
@@ -207,27 +217,5 @@ function initBuffers() {
 		}
 	}
 
-	moonVertexNormalBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexNormalBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
-	moonVertexNormalBuffer.itemSize = 3;
-	moonVertexNormalBuffer.numItems = normalData.length / 3;
-
-	moonVertexTextureCoordBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordData), gl.STATIC_DRAW);
-	moonVertexTextureCoordBuffer.itemSize = 2;
-	moonVertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
-
-	moonVertexPositionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexPositionBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
-	moonVertexPositionBuffer.itemSize = 3;
-	moonVertexPositionBuffer.numItems = vertexPositionData.length / 3;
-
-	moonVertexIndexBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
-	moonVertexIndexBuffer.itemSize = 1;
-	moonVertexIndexBuffer.numItems = indexData.length;
+	moon = new VertexBuffer(vertexPositionData, textureCoordData, normalData, indexData);
 }
