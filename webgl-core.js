@@ -66,6 +66,7 @@ function createProgram(vertexShaderFile, fragmentShaderFile) {
 	program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
 	program.pointLightingSpecularColorUniform = gl.getUniformLocation(program, "uPointLightingSpecularColor");
 	program.pointLightingDiffuseColorUniform = gl.getUniformLocation(program, "uPointLightingDiffuseColor");
+	program.pointLightingAttenuationUniform = gl.getUniformLocation(program, "uPointLightingAttenuation");
 	return program;
 }
 
