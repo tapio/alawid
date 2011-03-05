@@ -31,10 +31,12 @@ function Actor(type, pos, texture) {
 	this.draw = function() {
 		mvPushMatrix();
 		mat4.translate(mvMatrix, this.pos);
+		gl.disable(gl.DEPTH_TEST);
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this.texture);
 		gl.uniform1i(curProg.samplerUniform, 0);
 		this.buffer.draw();
+		gl.enable(gl.DEPTH_TEST);
 		mvPopMatrix();
 	}
 }
