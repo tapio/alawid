@@ -46,7 +46,7 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 }
 
 function initBuffers() {
-	vertices = [
+	var vertices = [
 		// Front face
 		-1.0, -1.0,  1.0,
 		 1.0, -1.0,  1.0,
