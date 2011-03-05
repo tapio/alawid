@@ -55,9 +55,9 @@
 		}
 
 		if (pressedKeys[38] || pressedKeys[87]) { // Up cursor key or W
-			vec3.add(player.pos, [0, 0, -1]);
+			vec3.add(player.pos, [0,  1, 0]);
 		} else if (pressedKeys[40] || pressedKeys[83]) { // Down cursor key
-			vec3.add(player.pos, [0, 0,  1]);
+			vec3.add(player.pos, [0, -1, 0]);
 		}
 	}
 
@@ -92,8 +92,7 @@
 		gl.uniform1i(curProg.useTexturesUniform, textures);
 
 		mat4.identity(mvMatrix);
-		mat4.translate(mvMatrix, [0, 5, 0]);
-		mat4.rotate(mvMatrix, degToRad(90), [1, 0, 0]);
+		mat4.translate(mvMatrix, [0, 0, -10]);
 
 		player.draw();
 	}
