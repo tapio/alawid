@@ -168,9 +168,11 @@ function World() {
 		gl.activeTexture(gl.TEXTURE0);
 		gl.uniform1i(curProg.samplerUniform, 0);
 		// Floor
+		gl.uniform1f(curProg.materialShininessUniform, 10000.0);
 		gl.bindTexture(gl.TEXTURE_2D, textures["floor"]);
 		this.floorBuffer.draw();
 		// Walls
+		gl.uniform1f(curProg.materialShininessUniform, 32.0);
 		gl.bindTexture(gl.TEXTURE_2D, textures["wall"]);
 		this.wallBuffer.draw();
 	}
