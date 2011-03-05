@@ -61,8 +61,6 @@ function createProgram(vertexShaderFile, fragmentShaderFile) {
 	program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
 	program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix");
 	program.samplerUniform = gl.getUniformLocation(program, "uSampler");
-	program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures");
-	program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
 	program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
 	program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
 	program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");

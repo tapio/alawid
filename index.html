@@ -15,12 +15,10 @@
 	// Shaders
 
 	var curProg;
-	var perVertexProgram;
-	var perFragmentProgram;
+	var coreShaderProgram;
 
 	function initShaders() {
-		perVertexProgram = createProgram("per-vertex-lighting.vert", "per-vertex-lighting.frag");
-		perFragmentProgram = createProgram("per-fragment-lighting.vert", "per-fragment-lighting.frag");
+		coreShaderProgram = createProgram("per-fragment-lighting.vert", "per-fragment-lighting.frag");
 	}
 
 	// Textures
@@ -72,27 +70,16 @@
 
 		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
 
-		var perFragmentLighting = document.getElementById("per-fragment").checked;
-		if (perFragmentLighting) {
-			curProg = perFragmentProgram;
-		} else {
-			curProg = perVertexProgram;
-		}
+		curProg = coreShaderProgram;
 		gl.useProgram(curProg);
 
-		var lighting = document.getElementById("lighting").checked
-		gl.uniform1i(curProg.useLightingUniform, lighting);
-		if (lighting) {
-			var ambient = vec3.create([0.2, 0.2, 0.2]);
-			var diffuse = vec3.create([0.8, 0.8, 0.8]);
-			var lightPos = vec3.create([0.0, 0.0, -5.0]);
-			gl.uniform3f(curProg.ambientColorUniform, ambient[0], ambient[1], ambient[2]);
-			gl.uniform3f(curProg.pointLightingColorUniform, diffuse[0], diffuse[1], diffuse[2]);
-			gl.uniform3f(curProg.pointLightingLocationUniform, lightPos[0], lightPos[1], lightPos[2]);
-		}
-
-		var textures = document.getElementById("textures").checked;
-		gl.uniform1i(curProg.useTexturesUniform, textures);
+		 // Lighting
+		var ambient = vec3.create([0.2, 0.2, 0.2]);
+		var diffuse = vec3.create([0.8, 0.8, 0.8]);
+		var lightPos = vec3.create([0.0, 0.0, -5.0]);
+		gl.uniform3f(curProg.ambientColorUniform, ambient[0], ambient[1], ambient[2]);
+		gl.uniform3f(curProg.pointLightingColorUniform, diffuse[0], diffuse[1], diffuse[2]);
+		gl.uniform3f(curProg.pointLightingLocationUniform, lightPos[0], lightPos[1], lightPos[2]);
 
 		mat4.identity(mvMatrix);
 
@@ -156,11 +143,6 @@
 <body onload="webGLStart();">
 
 	<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
-	<br/>
-
-	<input type="checkbox" id="lighting" checked /> Lighting &nbsp;|&nbsp;
-	<input type="checkbox" id="per-fragment" checked /> Per-fragment lighting &nbsp;|&nbsp;
-	<input type="checkbox" id="textures" checked /> Texturing
 	<br/>
 
 </body>
