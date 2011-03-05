@@ -61,9 +61,11 @@ function createProgram(vertexShaderFile, fragmentShaderFile) {
 	program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
 	program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix");
 	program.samplerUniform = gl.getUniformLocation(program, "uSampler");
+	program.materialShininessUniform = gl.getUniformLocation(program, "uMaterialShininess");
 	program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
 	program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
-	program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
+	program.pointLightingSpecularColorUniform = gl.getUniformLocation(program, "uPointLightingSpecularColor");
+	program.pointLightingDiffuseColorUniform = gl.getUniformLocation(program, "uPointLightingDiffuseColor");
 	return program;
 }
 
@@ -162,6 +164,15 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 	}
 }
 
+
+// Lighting
+
+function PointLight(position, diffuse, attenuation, specular) {
+	this.position = position;
+	this.diffuse = diffuse;
+	this.attenuation = attenuation;
+	this.specular = specular || vec3.create([1.0, 1.0, 1.0]);
+}
 
 // Utilities
 

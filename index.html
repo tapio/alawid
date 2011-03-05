@@ -80,10 +80,13 @@
 		 // Lighting
 		var ambient = vec3.create([0.2, 0.2, 0.2]);
 		var diffuse = vec3.create([0.8, 0.8, 0.8]);
-		var lightPos = vec3.create([0.0, 0.0, -5.0]);
+		var specular = vec3.create([1.0, 1.0, 1.0]);
+		var lightPos = vec3.create([player.pos[0], player.pos[1], -0.5]);
 		gl.uniform3f(curProg.ambientColorUniform, ambient[0], ambient[1], ambient[2]);
-		gl.uniform3f(curProg.pointLightingColorUniform, diffuse[0], diffuse[1], diffuse[2]);
+		gl.uniform3f(curProg.pointLightingDiffuseColorUniform, diffuse[0], diffuse[1], diffuse[2]);
+		gl.uniform3f(curProg.pointLightingSpecularColorUniform, specular[0], specular[1], specular[2]);
 		gl.uniform3f(curProg.pointLightingLocationUniform, lightPos[0], lightPos[1], lightPos[2]);
+		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
 		mat4.identity(mvMatrix);
 
