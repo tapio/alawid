@@ -99,8 +99,6 @@
 		world.draw();
 
 		player.draw();
-		dummy2.draw();
-		dummy1.draw();
 	}
 
 
@@ -137,9 +135,7 @@
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
 
-		player = new Actor("player", [0, 0, 0], textures["player"]);
-		dummy1 = new Actor("player", [-1, 0, 0], textures["player"]);
-		dummy2 = new Actor("player", [0, 1, 0], textures["player"]);
+		player = new Actor("player", [2, 2, 0], textures["player"]);
 
 		world = new World();
 
