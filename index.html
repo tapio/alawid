@@ -49,19 +49,22 @@
 
 	function handleKeys() {
 		if (pressedKeys[37] || pressedKeys[65]) { // Left cursor key or A
-			vec3.add(player.pos, [-1, 0, 0]);
+			vec3.add(player.pos, [-0.1, 0, 0]);
 		} else if (pressedKeys[39] || pressedKeys[68]) { // Right cursor key or D
-			vec3.add(player.pos, [ 1, 0, 0]);
+			vec3.add(player.pos, [ 0.1, 0, 0]);
 		}
 
 		if (pressedKeys[38] || pressedKeys[87]) { // Up cursor key or W
-			vec3.add(player.pos, [0,  1, 0]);
+			vec3.add(player.pos, [0,  0.1, 0]);
 		} else if (pressedKeys[40] || pressedKeys[83]) { // Down cursor key
-			vec3.add(player.pos, [0, -1, 0]);
+			vec3.add(player.pos, [0, -0.1, 0]);
 		}
 	}
 
 	// Rendering
+
+	var cameraHeight = -10.0;
+	var cameraPos = vec3.create([0, 0, cameraHeight]);
 
 	function drawScene() {
 		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -92,9 +95,15 @@
 		gl.uniform1i(curProg.useTexturesUniform, textures);
 
 		mat4.identity(mvMatrix);
-		mat4.translate(mvMatrix, [0, 0, -10]);
+
+		// Camera
+		vec3.lerp(cameraPos, player.pos, 0.1);
+		cameraPos[2] = cameraHeight; // Constant height
+		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
 
 		player.draw();
+		dummy2.draw();
+		dummy1.draw();
 	}
 
 
@@ -130,6 +139,8 @@
 		document.onkeyup = handleKeyUp;
 
 		player = new Actor("player", [0, 0, 0], textures["player"]);
+		dummy1 = new Actor("player", [-1, 0, 0], textures["player"]);
+		dummy2 = new Actor("player", [0, 1, 0], textures["player"]);
 
 		tick();
 	}
