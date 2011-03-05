@@ -105,9 +105,6 @@
 		var timeNow = new Date().getTime();
 		if (lastTime != 0) {
 			var elapsed = timeNow - lastTime;
-
-			moonAngle += 0.05 * elapsed;
-			cubeAngle += 0.05 * elapsed;
 		}
 		lastTime = timeNow;
 	}
