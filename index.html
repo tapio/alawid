@@ -1,0 +1,155 @@
+<html>
+
+<head>
+<title>WebGL Test</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="webgl-core.js"></script>
+<script type="text/javascript" src="actor.js"></script>
+<script type="text/javascript" src="world.js"></script>
+
+<script type="text/javascript">
+
+
+	// Shaders
+
+	var curProg;
+	var coreShaderProgram;
+
+	function initShaders() {
+		coreShaderProgram = createProgram("core.vert", "core.frag");
+	}
+
+	// Textures
+
+	var textures = {};
+
+	function initTextures() {
+		textures["player"] = loadTexture("textures/char.png");
+		textures["floor"] = loadTexture("textures/floor.jpg");
+		textures["wall"] = loadTexture("textures/wall.jpg");
+	}
+
+	// Objects etc.
+
+	var player;
+	var world;
+
+	// Key handling
+
+	var pressedKeys = {};
+
+	function handleKeyDown(event) {
+		pressedKeys[event.keyCode] = true;
+	}
+
+	function handleKeyUp(event) {
+		pressedKeys[event.keyCode] = false;
+	}
+
+	function handleKeys() {
+		var oldpos = vec3.create(player.pos);
+
+		if (pressedKeys[37] || pressedKeys[65]) { // Left cursor key or A
+			vec3.add(player.pos, [-0.1, 0, 0]);
+		} else if (pressedKeys[39] || pressedKeys[68]) { // Right cursor key or D
+			vec3.add(player.pos, [ 0.1, 0, 0]);
+		}
+
+		if (pressedKeys[38] || pressedKeys[87]) { // Up cursor key or W
+			vec3.add(player.pos, [0,  0.1, 0]);
+		} else if (pressedKeys[40] || pressedKeys[83]) { // Down cursor key
+			vec3.add(player.pos, [0, -0.1, 0]);
+		}
+
+		if (world.isWall(player.pos)) player.pos = oldpos;
+	}
+
+	// Rendering
+
+	var cameraHeight = -8.0;
+	var cameraPos = vec3.create([0, 0, cameraHeight]);
+
+	function drawScene() {
+		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+
+		curProg = coreShaderProgram;
+		gl.useProgram(curProg);
+
+		mat4.identity(mvMatrix);
+
+		// Camera
+		vec3.lerp(cameraPos, player.pos, 0.1);
+		cameraPos[2] = cameraHeight; // Constant height
+		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
+
+		 // Lighting
+		lights[0].position = vec3.create([player.pos[0], player.pos[1], 1.0]);
+		setLightUniforms();
+		gl.uniform1f(curProg.materialShininessUniform, 512.0);
+
+		world.draw();
+
+		player.draw();
+	}
+
+
+	var lastTime = 0;
+
+	function animate() {
+		var timeNow = new Date().getTime();
+		if (lastTime != 0) {
+			var elapsed = timeNow - lastTime;
+		}
+		lastTime = timeNow;
+	}
+
+
+	function tick() {
+		requestAnimFrame(tick);
+		handleKeys();
+		drawScene();
+		animate();
+	}
+
+
+	function webGLStart() {
+		var canvas = document.getElementById("glcanvas");
+		initGL(canvas);
+		initShaders();
+		initTextures();
+
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		gl.enable(gl.BLEND);
+		gl.enable(gl.DEPTH_TEST);
+
+		document.onkeydown = handleKeyDown;
+		document.onkeyup = handleKeyUp;
+
+		player = new Actor("player", [2, 2, 0], textures["player"]);
+		lights[0] = new PointLight(player.pos);
+		world = new World();
+
+		tick();
+	}
+
+</script>
+
+
+</head>
+
+
+<body onload="webGLStart();">
+
+	<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
+	<br/>
+
+</body>
+
+</html>
