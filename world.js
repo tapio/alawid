@@ -35,7 +35,9 @@ function World() {
 			var row = data[j];
 			for (var i = 0; i < row.length; ++i) {
 				var c = row[i];
-				if (c == '#') {
+				if (c == "*") {
+					lights.push(new PointLight([i, j, 1.0]));
+				} else if (c == '#') {
 					var cubeVertices = [
 						// Front face
 						-0.5+i, -0.5+j, 1.5,
@@ -159,13 +161,13 @@ function World() {
 	this.setLevel([
 		"##########",
 		"# #      #",
-		"#  ##    #",
+		"#  ##  * #",
 		"#     #  #",
 		"#  #     #",
 		"#   # #  #",
 		"# #      #",
 		"#   #  # #",
-		"#  #     #",
+		"#  #    *#",
 		"##########"
 		]);
 
@@ -178,7 +180,7 @@ function World() {
 			if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
 				return true;
 			var c = this.levelData[y][x];
-			if (c != " ") return true;
+			if (c != " " && c != "*") return true;
 		}
 		return false;
 	}

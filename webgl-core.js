@@ -173,7 +173,7 @@ var lights = [];
 
 function PointLight(position, diffuse, attenuation, specular) {
 	this.position = position;
-	this.diffuse = diffuse || vec3.create([1.0, 1.0, 1.0]);
+	this.diffuse = diffuse || vec3.create([0.9, 0.6, 0.1]);
 	this.attenuation = attenuation || vec3.create([0.0, 0.0, 1.0]);
 	this.specular = specular || vec3.create([1.0, 1.0, 1.0]);
 }
