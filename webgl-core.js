@@ -63,10 +63,11 @@ function createProgram(vertexShaderFile, fragmentShaderFile) {
 	program.samplerUniform = gl.getUniformLocation(program, "uSampler");
 	program.materialShininessUniform = gl.getUniformLocation(program, "uMaterialShininess");
 	program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
-	program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
-	program.pointLightingSpecularColorUniform = gl.getUniformLocation(program, "uPointLightingSpecularColor");
-	program.pointLightingDiffuseColorUniform = gl.getUniformLocation(program, "uPointLightingDiffuseColor");
-	program.pointLightingAttenuationUniform = gl.getUniformLocation(program, "uPointLightingAttenuation");
+	program.lightCountUniform = gl.getUniformLocation(program, "uLightCount");
+	program.lightPositionUniform = gl.getUniformLocation(program, "uLightPositions");
+	program.lightDiffuseUniform = gl.getUniformLocation(program, "uLightDiffuseColors");
+	program.lightSpecularUniform = gl.getUniformLocation(program, "uLightSpecularColors");
+	program.lightAttenuationUniform = gl.getUniformLocation(program, "uLightAttenuations");
 	return program;
 }
 
@@ -168,11 +169,35 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 
 // Lighting
 
+var lights = [];
+
 function PointLight(position, diffuse, attenuation, specular) {
 	this.position = position;
-	this.diffuse = diffuse;
-	this.attenuation = attenuation;
+	this.diffuse = diffuse || vec3.create([1.0, 1.0, 1.0]);
+	this.attenuation = attenuation || vec3.create([0.0, 0.0, 1.0]);
 	this.specular = specular || vec3.create([1.0, 1.0, 1.0]);
+}
+
+function setLightUniforms() {
+	var ambient = vec3.create([0.1, 0.1, 0.1]);
+	gl.uniform3f(curProg.ambientColorUniform, ambient[0], ambient[1], ambient[2]);
+	var lightCount = Math.min(lights.length, 12);
+	gl.uniform1i(curProg.lightCountUniform, lightCount);
+
+	var position = [], diffuse = [], specular = [], attenuation = [];
+	for (var i = 0; i < lightCount; ++i) {
+		var lightPos = vec3.create(lights[i].position);
+		mat4.multiplyVec3(mvMatrix, lightPos);
+		function concat(a, b) { return a.concat([b[0], b[1], b[2]]); }
+		position = concat(position, lightPos);
+		diffuse = concat(diffuse, lights[i].diffuse);
+		specular = concat(specular, lights[i].specular);
+		attenuation = concat(attenuation, lights[i].attenuation);
+	}
+	gl.uniform3fv(curProg.lightPositionUniform, position);
+	gl.uniform3fv(curProg.lightDiffuseUniform, diffuse);
+	gl.uniform3fv(curProg.lightSpecularUniform, specular);
+	gl.uniform3fv(curProg.lightAttenuationUniform, attenuation);
 }
 
 // Utilities

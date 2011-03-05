@@ -89,17 +89,8 @@
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
 
 		 // Lighting
-		var ambient = vec3.create([0.1, 0.1, 0.1]);
-		var diffuse = vec3.create([0.8, 0.8, 0.8]);
-		var specular = vec3.create([1.0, 1.0, 1.0]);
-		var attenuation = vec3.create([0.0, 0.0, 1.0]);
-		var lightPos = vec3.create([player.pos[0], player.pos[1], 1.0]);
-		mat4.multiplyVec3(mvMatrix, lightPos);
-		gl.uniform3f(curProg.ambientColorUniform, ambient[0], ambient[1], ambient[2]);
-		gl.uniform3f(curProg.pointLightingDiffuseColorUniform, diffuse[0], diffuse[1], diffuse[2]);
-		gl.uniform3f(curProg.pointLightingSpecularColorUniform, specular[0], specular[1], specular[2]);
-		gl.uniform3f(curProg.pointLightingAttenuationUniform, attenuation[0], attenuation[1], attenuation[2]);
-		gl.uniform3f(curProg.pointLightingLocationUniform, lightPos[0], lightPos[1], lightPos[2]);
+		lights[0].position = vec3.create([player.pos[0], player.pos[1], 1.0]);
+		setLightUniforms();
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
 		world.draw();
@@ -142,7 +133,7 @@
 		document.onkeyup = handleKeyUp;
 
 		player = new Actor("player", [2, 2, 0], textures["player"]);
-
+		lights[0] = new PointLight(player.pos);
 		world = new World();
 
 		tick();
