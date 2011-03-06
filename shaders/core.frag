@@ -18,7 +18,9 @@ uniform vec3 uLightDiffuseColors[MAX_LIGHTS];
 uniform vec3 uLightSpecularColors[MAX_LIGHTS];
 uniform vec3 uLightAttenuations[MAX_LIGHTS];
 
-uniform sampler2D uSampler;
+uniform int uEnableNormalMap;
+uniform sampler2D uTextureSampler;
+uniform sampler2D uNormalMapSampler;
 
 
 void main(void) {
@@ -26,12 +28,18 @@ void main(void) {
 	vec3 normal = normalize(vTransformedNormal);
 	vec3 eyeDirection = normalize(-vPosition.xyz);
 
+	vec3 bump = normal;
+	if (uEnableNormalMap > 0) {
+		bump = normalize(texture2D(uNormalMapSampler, vTextureCoord.st).xyz * 2.0 - 1.0);
+	}
+
 	for (int i = 0; i < MAX_LIGHTS; ++i) {
 		if (i >= uLightCount) break;
 		vec3 lightDirection = normalize(uLightPositions[i] - vPosition.xyz);
+		float diffuse = max(dot(normal, lightDirection), 0.0);
+
 		vec3 reflectionDirection = reflect(-lightDirection, normal);
 		float specular = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess);
-		float diffuse = max(dot(normal, lightDirection), 0.0);
 
 		// Attenuation
 		float attenuation = 1.0;
@@ -51,6 +59,6 @@ void main(void) {
 
 	lightWeighting += uAmbientColor;
 
-	vec4 fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+	vec4 fragmentColor = texture2D(uTextureSampler, vTextureCoord.st);
 	gl_FragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
 }

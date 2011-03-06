@@ -186,14 +186,20 @@ function World() {
 	}
 
 	this.draw = function() {
-		gl.activeTexture(gl.TEXTURE0);
-		gl.uniform1i(curProg.samplerUniform, 0);
+		gl.uniform1i(curProg.textureSamplerUniform, 0);
+		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
 		// Floor
+		gl.uniform1i(curProg.enableNormalMapUniform, 1);
 		gl.uniform1f(curProg.materialShininessUniform, 10000.0);
+		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, textures["floor"]);
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, textures["floor_normalmap"]);
 		this.floorBuffer.draw();
+		gl.uniform1i(curProg.enableNormalMapUniform, 0);
 		// Walls
 		gl.uniform1f(curProg.materialShininessUniform, 32.0);
+		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, textures["wall"]);
 		this.wallBuffer.draw();
 	}

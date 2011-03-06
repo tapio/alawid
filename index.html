@@ -30,6 +30,7 @@
 	function initTextures() {
 		textures["player"] = loadTexture("textures/char.png");
 		textures["floor"] = loadTexture("textures/floor.jpg");
+		textures["floor_normalmap"] = loadTexture("textures/floor_normalmap.jpg");
 		textures["wall"] = loadTexture("textures/wall.jpg");
 	}
 
@@ -81,6 +82,7 @@
 
 		curProg = coreShaderProgram;
 		gl.useProgram(curProg);
+		gl.uniform1i(curProg.enableNormalMapUniform, 0);
 
 		mat4.identity(mvMatrix);
 
