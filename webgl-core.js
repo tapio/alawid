@@ -129,7 +129,7 @@ function setMatrixUniforms() {
 
 // Vetex buffer object capable of drawing itself
 
-function VertexBuffer(vertices, texcoords, normals, indices) {
+function VertexBuffer(vertices, texcoords, normals, indices, tangs) {
 	this.positionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -150,8 +150,10 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 
 	// Generate tangents
 	// Based on http://www.terathon.com/code/tangent.html
-
 	var tangents = [];
+if (tangs) {
+	tangents = tangs;
+} else {
 	// Initialize empty tangent array
 	for (var i = 0; i < vertices.length; ++i) tangents.push(0.0);
 	// Loop the triangles
@@ -200,6 +202,7 @@ if (vertices.length < 16)
 		tangents[i*3+1] = t[1];
 		tangents[i*3+2] = t[2];
 	}
+}
 if (tangents.length == 12) {
 	for (var i = 0; i < 4; i++)
 		console.log(tangents[i*3+0], tangents[i*3+1], tangents[i*3+2]);
@@ -245,7 +248,7 @@ const MAX_LIGHTS = 10;
 function PointLight(position, diffuse, attenuation, specular) {
 	this.position = position;
 	this.diffuse = diffuse || vec3.create([0.9, 0.6, 0.1]);
-	this.attenuation = attenuation || vec3.create([0.0, 0.0, 1.0]);
+	this.attenuation = attenuation || vec3.create([0.0, 0.0, 10.0]);
 	this.specular = specular || vec3.create([1.0, 1.0, 1.0]);
 }
 

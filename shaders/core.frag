@@ -2,12 +2,7 @@
 precision highp float;
 #endif
 
-#define MAX_LIGHTS 12
-
-varying vec4 vPosition;
-varying vec3 vTransformedNormal;
-varying vec3 vTangent;
-varying vec2 vTextureCoord;
+#define MAX_LIGHTS 10
 
 uniform float uMaterialShininess;
 
@@ -19,33 +14,34 @@ uniform vec3 uLightDiffuseColors[MAX_LIGHTS];
 uniform vec3 uLightSpecularColors[MAX_LIGHTS];
 uniform vec3 uLightAttenuations[MAX_LIGHTS];
 
-uniform int uEnableNormalMap;
+uniform bool uEnableNormalMap;
 uniform sampler2D uTextureSampler;
 uniform sampler2D uNormalMapSampler;
+
+varying vec4 vPosition;
+varying vec2 vTextureCoord;
+varying vec3 vViewVector;
+varying vec3 vLightVectors[MAX_LIGHTS];
 
 
 void main(void) {
 	vec3 lightWeighting = vec3(0.0, 0.0, 0.0);
-	vec3 normal = normalize(vTransformedNormal);
-	vec3 eyeDirection = normalize(-vPosition.xyz);
+	vec3 viewVec = normalize(vViewVector);
 
-	if (uEnableNormalMap == 100) { //FIXME
-		vec3 bump = normalize(texture2D(uNormalMapSampler, vTextureCoord.st).xyz * 2.0 - 1.0);
-		vec3 tangent = normalize(vTangent);
-		vec3 ncrosst = normalize(cross(normal, tangent));
-		mat3 basis = mat3(normal, tangent, ncrosst);
-		normal = basis * bump;
+	vec3 bump = vec3(0.0, 0.0, 0.0);
+	if (uEnableNormalMap) {
+		bump = normalize(texture2D(uNormalMapSampler, vTextureCoord.st).xyz * 2.0 - 1.0);
 	}
+	vec3 refl = reflect(-viewVec, bump);
 
 	for (int i = 0; i < MAX_LIGHTS; ++i) {
 		if (i >= uLightCount) break;
-		vec3 lightDirection = normalize(uLightPositions[i] - vPosition.xyz);
-		float diffuse = max(dot(normal, lightDirection), 0.0);
+		vec3 lightVec = normalize(vLightVectors[i]);
+		float diffuse = max(dot(lightVec, bump), 0.0);
 
 		float specular = 0.0;
 		if (uMaterialShininess < 1000.0) {
-			vec3 reflectionDirection = reflect(-lightDirection, normal);
-			float specular = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess);
+			specular = pow(clamp(dot(refl, lightVec), 0.0, 1.0), uMaterialShininess);
 		}
 
 		// Attenuation
