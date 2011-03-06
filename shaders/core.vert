@@ -16,7 +16,7 @@ uniform int uEnableNormalMap;
 
 void main(void) {
 	if (uEnableNormalMap == 1) {
-		vTangent = aVertexTangent; //(uMVMatrix * vec4(aVertexTangent, 1.0)).xyz;
+		vTangent = (uMVMatrix * vec4(aVertexTangent, 1.0)).xyz;
 	}
 	vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
 	vTextureCoord = aTextureCoord;

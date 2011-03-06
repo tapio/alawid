@@ -29,7 +29,7 @@ void main(void) {
 	vec3 normal = normalize(vTransformedNormal);
 	vec3 eyeDirection = normalize(-vPosition.xyz);
 
-	if (uEnableNormalMap == 1) {
+	if (uEnableNormalMap == 100) { //FIXME
 		vec3 bump = normalize(texture2D(uNormalMapSampler, vTextureCoord.st).xyz * 2.0 - 1.0);
 		vec3 tangent = normalize(vTangent);
 		vec3 ncrosst = normalize(cross(normal, tangent));
