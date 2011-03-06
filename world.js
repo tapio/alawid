@@ -90,7 +90,7 @@ function World() {
 			for (var i = 0; i < row.length; ++i) {
 				var c = row[i];
 				if (c == "*") {
-					lights.push(new PointLight([i, j, 1.0]));
+					lights.push(new PointLight([i, j, Math.random(h * 0.5) + 1]));
 				} else if (c == '#') {
 					const h = 10.0;
 					var cubeVertices = [
