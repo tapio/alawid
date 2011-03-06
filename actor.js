@@ -12,10 +12,10 @@ function Actor(type, pos, texture) {
 		-0.5,+0.5, 0.0
 		];
 	var texcoords = [
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
 		0.0, 1.0,
+		1.0, 1.0,
+		1.0, 0.0,
+		0.0, 0.0,
 		];
 	var normals = [
 		0.0, 0.0, 1.0,
@@ -32,9 +32,8 @@ function Actor(type, pos, texture) {
 		mvPushMatrix();
 		mat4.translate(mvMatrix, this.pos);
 		gl.disable(gl.DEPTH_TEST);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		gl.uniform1i(curProg.samplerUniform, 0);
+		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
+		useTexture(this.texture);
 		this.buffer.draw();
 		gl.enable(gl.DEPTH_TEST);
 		mvPopMatrix();

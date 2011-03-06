@@ -1,9 +1,10 @@
+<!DOCTYPE HTML>
 <html>
 
 <head>
-<title>WebGL Test</title>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-
+<title>WebGL 7DRL</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link type="text/css" rel="stylesheet" href="style.css" />
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
 <script type="text/javascript" src="webgl-core.js"></script>
@@ -28,8 +29,11 @@
 
 	function initTextures() {
 		textures["player"] = loadTexture("textures/char.png");
+		textures["player_normalmap"] = loadTexture("textures/char_normalmap.png");
 		textures["floor"] = loadTexture("textures/floor.jpg");
+		textures["floor_normalmap"] = loadTexture("textures/floor_normalmap.jpg");
 		textures["wall"] = loadTexture("textures/wall.jpg");
+		textures["wall_normalmap"] = loadTexture("textures/wall_normalmap.jpg");
 	}
 
 	// Objects etc.
@@ -51,25 +55,25 @@
 
 	function handleKeys() {
 		var oldpos = vec3.create(player.pos);
-
 		if (pressedKeys[37] || pressedKeys[65]) { // Left cursor key or A
 			vec3.add(player.pos, [-0.1, 0, 0]);
 		} else if (pressedKeys[39] || pressedKeys[68]) { // Right cursor key or D
 			vec3.add(player.pos, [ 0.1, 0, 0]);
 		}
+		if (world.map.isWall(player.pos)) player.pos = oldpos;
 
+		oldpos = vec3.create(player.pos);
 		if (pressedKeys[38] || pressedKeys[87]) { // Up cursor key or W
-			vec3.add(player.pos, [0,  0.1, 0]);
-		} else if (pressedKeys[40] || pressedKeys[83]) { // Down cursor key
 			vec3.add(player.pos, [0, -0.1, 0]);
+		} else if (pressedKeys[40] || pressedKeys[83]) { // Down cursor key
+			vec3.add(player.pos, [0,  0.1, 0]);
 		}
-
-		if (world.isWall(player.pos)) player.pos = oldpos;
+		if (world.map.isWall(player.pos)) player.pos = oldpos;
 	}
 
 	// Rendering
 
-	var cameraHeight = -8.0;
+	var cameraHeight = -6.0;
 	var cameraPos = vec3.create([0, 0, cameraHeight]);
 
 	function drawScene() {
@@ -80,11 +84,23 @@
 
 		curProg = coreShaderProgram;
 		gl.useProgram(curProg);
+		// General uniforms
+		gl.uniform1i(curProg.textureSamplerUniform, 0);
+		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
+		gl.uniform1i(curProg.enableNormalMapUniform, 1);
 
 		mat4.identity(mvMatrix);
+		mvMatrix[5] = -1; // Flip y-axis
 
 		// Camera
 		vec3.lerp(cameraPos, player.pos, 0.1);
+		/*var dx = cameraPos[0] - player.pos[0];
+		var dy = player.pos[1] - cameraPos[1];
+		var dist = Math.sqrt(dx*dx + dy*dy);
+		if (dist > 0.01) {
+			dist = Math.min(dist, 1.0);
+			mat4.rotate(mvMatrix, -degToRad(35.0 * dist), [dy, dx, 0]);
+		}*/
 		cameraPos[2] = cameraHeight; // Constant height
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
 
@@ -105,6 +121,13 @@
 		var timeNow = new Date().getTime();
 		if (lastTime != 0) {
 			var elapsed = timeNow - lastTime;
+
+			// Animate lights
+			for (var i = 0; i < lights.length; ++i) {
+				var anim = timeNow / (1000.0 + i);
+				anim = 0.3 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
+				lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
+			}
 		}
 		lastTime = timeNow;
 	}
@@ -132,9 +155,9 @@
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
 
-		player = new Actor("player", [2, 2, 0], textures["player"]);
-		lights[0] = new PointLight(player.pos);
+		lights[0] = new PointLight();
 		world = new World();
+		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
 
 		tick();
 	}
@@ -147,9 +170,15 @@
 
 <body onload="webGLStart();">
 
-	<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
-	<br/>
-
+	<header>
+		<h1>WebGL 7DRL</h1>
+	</header>
+	<div id="game">
+		<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
+	</div>
+	<footer>
+		<span class="copyright">&copy; Tapio Vierros 2011</span>
+	</footer>
 </body>
 
 </html>
