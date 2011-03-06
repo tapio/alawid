@@ -109,6 +109,13 @@
 		var timeNow = new Date().getTime();
 		if (lastTime != 0) {
 			var elapsed = timeNow - lastTime;
+
+			// Animate lights
+			for (var i = 0; i < lights.length; ++i) {
+				var anim = timeNow / (1000.0 + i);
+				anim = 0.3 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
+				lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
+			}
 		}
 		lastTime = timeNow;
 	}
