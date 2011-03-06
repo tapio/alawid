@@ -31,10 +31,13 @@ function Actor(type, pos, texture) {
 	this.draw = function() {
 		mvPushMatrix();
 		mat4.translate(mvMatrix, this.pos);
+		gl.uniform1i(curProg.textureSamplerUniform, 0);
+		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
 		gl.disable(gl.DEPTH_TEST);
 		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		gl.uniform1i(curProg.samplerUniform, 0);
+		gl.bindTexture(gl.TEXTURE_2D, textures[this.texture]);
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, textures[this.texture + "_normalmap"]);
 		this.buffer.draw();
 		gl.enable(gl.DEPTH_TEST);
 		mvPopMatrix();

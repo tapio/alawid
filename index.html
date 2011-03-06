@@ -29,6 +29,7 @@
 
 	function initTextures() {
 		textures["player"] = loadTexture("textures/char.png");
+		textures["player_normalmap"] = loadTexture("textures/char_normalmap.png");
 		textures["floor"] = loadTexture("textures/floor.jpg");
 		textures["floor_normalmap"] = loadTexture("textures/floor_normalmap.jpg");
 		textures["wall"] = loadTexture("textures/wall.jpg");
@@ -83,7 +84,7 @@
 
 		curProg = coreShaderProgram;
 		gl.useProgram(curProg);
-		gl.uniform1i(curProg.enableNormalMapUniform, 0);
+		gl.uniform1i(curProg.enableNormalMapUniform, 1);
 
 		mat4.identity(mvMatrix);
 		mvMatrix[5] = -1; // Flip y-axis
@@ -144,7 +145,7 @@
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
 
-		player = new Actor("player", [2, 2, 0], textures["player"]);
+		player = new Actor("player", [2, 2, 0], "player");
 		lights[0] = new PointLight(player.pos);
 		world = new World();
 

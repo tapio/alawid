@@ -214,7 +214,6 @@ function World() {
 	this.draw = function() {
 		gl.uniform1i(curProg.textureSamplerUniform, 0);
 		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
-		gl.uniform1i(curProg.enableNormalMapUniform, 1);
 		// Floor
 		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
 		gl.activeTexture(gl.TEXTURE0);
@@ -229,6 +228,5 @@ function World() {
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, textures["wall_normalmap"]);
 		this.wallBuffer.draw();
-		gl.uniform1i(curProg.enableNormalMapUniform, 0);
 	}
 }
