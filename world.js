@@ -1,17 +1,35 @@
 
-function DungeonMap() {
-	this.levelData = [
-		"##########",
-		"# #      #",
-		"#  ##  * #",
-		"#     #  #",
-		"#  #     #",
-		"#   # #  #",
-		"# #      #",
-		"#   #  # #",
-		"#  #    *#",
-		"##########"
-		];
+function DungeonMap(w, h) {
+	this.levelData = [];
+
+	this.placeRandomly = function(what, howmany) {
+		while (howmany > 0) {
+			var i = Math.floor(Math.random() * this.levelData[0].length);
+			var j = Math.floor(Math.random() * this.levelData.length / this.levelData[0].length);
+			if (this.levelData[j][i] == " ") {
+				this.levelData[j][i] = what;
+				--howmany;
+			}
+		}
+	}
+
+	this.generate = function(w, h) {
+		// Borders and floor
+		for (var j = 0; j < h; ++j) {
+			for (var i = 0; i < w; ++i) {
+				this.levelData.push([]);
+				if (i == 0 || j == 0 || i == w-1 || j == h-1)
+					this.levelData[j].push("#");
+				else this.levelData[j].push(" ");
+			}
+		}
+		// Some walls
+		this.placeRandomly("#", w*h/8);
+		// Some lights
+		this.placeRandomly("*", 8);
+	}
+
+	this.generate(w, h);
 
 	this.getBlock = function(pos) {
 		var x = Math.round(pos[0]), y = Math.round(pos[1]);
@@ -38,10 +56,9 @@ function DungeonMap() {
 
 
 function World() {
-
+	const s = 15.0;
 	// Create floor
 	{
-		const s = 10.0;
 		var vertices = [
 			-0.5, -0.5, 0.0,
 			s-.5, -0.5, 0.0,
@@ -191,7 +208,7 @@ function World() {
 		this.wallBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
 	}
 
-	this.map = new DungeonMap();
+	this.map = new DungeonMap(s, s);
 	this.createWallBuffer(this.map.levelData);
 
 	this.draw = function() {
