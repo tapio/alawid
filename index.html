@@ -84,6 +84,9 @@
 
 		curProg = coreShaderProgram;
 		gl.useProgram(curProg);
+		// General uniforms
+		gl.uniform1i(curProg.textureSamplerUniform, 0);
+		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
 		gl.uniform1i(curProg.enableNormalMapUniform, 1);
 
 		mat4.identity(mvMatrix);

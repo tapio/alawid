@@ -31,8 +31,6 @@ function Actor(type, pos, texture) {
 	this.draw = function() {
 		mvPushMatrix();
 		mat4.translate(mvMatrix, this.pos);
-		gl.uniform1i(curProg.textureSamplerUniform, 0);
-		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
 		gl.disable(gl.DEPTH_TEST);
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, textures[this.texture]);

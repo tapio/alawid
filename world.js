@@ -212,8 +212,6 @@ function World() {
 	this.createWallBuffer(this.map.levelData);
 
 	this.draw = function() {
-		gl.uniform1i(curProg.textureSamplerUniform, 0);
-		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
 		// Floor
 		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
 		gl.activeTexture(gl.TEXTURE0);
