@@ -10,23 +10,29 @@ function World() {
 			s-.5, s-.5, 0.0,
 			-0.5, s-.5, 0.0
 			];
-		var texcoords = [
-			0.0, 0.0,
-			s, 0.0,
-			s, s,
-			0.0, s,
-			];
 		var normals = [
 			0.0, 0.0, 1.0,
 			0.0, 0.0, 1.0,
 			0.0, 0.0, 1.0,
 			0.0, 0.0, 1.0
 			];
+		var tangents = [
+			0.0, 1.0, 0.0,
+			1.0, 0.0, 0.0,
+			0.0,-1.0, 0.0,
+			-1.0, 0.0, 0.0
+			];
+		var texcoords = [
+			0.0, 0.0,
+			s, 0.0,
+			s, s,
+			0.0, s,
+			];
 		var indices = [
 			0, 1, 2,    0, 2, 3
 			];
 	}
-	this.floorBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
+	this.floorBuffer = new VertexBuffer(vertices, texcoords, normals, indices, tangents);
 
 
 	this.createWallBuffer = function(data) {
@@ -189,7 +195,7 @@ function World() {
 		gl.uniform1i(curProg.textureSamplerUniform, 0);
 		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
 		// Floor
-		gl.uniform1i(curProg.enableNormalMapUniform, 1);
+		gl.uniform1i(curProg.enableNormalMapUniform, 0); // FIXME
 		gl.uniform1f(curProg.materialShininessUniform, 10000.0);
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, textures["floor"]);

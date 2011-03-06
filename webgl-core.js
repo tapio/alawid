@@ -54,6 +54,8 @@ function createProgram(vertexShaderFile, fragmentShaderFile) {
 	gl.enableVertexAttribArray(program.vertexPositionAttribute);
 	program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal");
 	gl.enableVertexAttribArray(program.vertexNormalAttribute);
+	program.vertexTangentAttribute = gl.getAttribLocation(program, "aVertexTangent");
+	//gl.enableVertexAttribArray(program.vertexTangentAttribute);
 	program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
 	gl.enableVertexAttribArray(program.textureCoordAttribute);
 
@@ -127,7 +129,7 @@ function setMatrixUniforms() {
 
 // Vetex buffer object capable of drawing itself
 
-function VertexBuffer(vertices, texcoords, normals, indices) {
+function VertexBuffer(vertices, texcoords, normals, indices, tangents) {
 	this.positionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -146,6 +148,14 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 	this.normalBuffer.itemSize = 3;
 	this.normalBuffer.numItems = normals.length / 3;
 
+	if (tangents) {
+		this.tangentBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.tangentBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tangents), gl.STATIC_DRAW);
+		this.tangentBuffer.itemSize = 3;
+		this.tangentBuffer.numItems = tangents.length / 3;
+	}
+
 	this.indexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
@@ -162,9 +172,19 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
 		gl.vertexAttribPointer(curProg.vertexNormalAttribute, this.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
+		if (this.tangentBuffer) {
+			gl.enableVertexAttribArray(curProg.vertexTangentAttribute);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.tangentBuffer);
+			gl.vertexAttribPointer(curProg.vertexTangentAttribute, this.tangentBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		}
+
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 		setMatrixUniforms();
 		gl.drawElements(gl.TRIANGLES, this.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+		if (this.tangentBuffer) {
+			gl.disableVertexAttribArray(curProg.vertexTangentAttribute);
+		}
 	}
 }
 

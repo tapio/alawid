@@ -4,9 +4,10 @@ precision highp float;
 
 #define MAX_LIGHTS 12
 
-varying vec2 vTextureCoord;
-varying vec3 vTransformedNormal;
 varying vec4 vPosition;
+varying vec3 vTransformedNormal;
+varying vec3 vTangent;
+varying vec2 vTextureCoord;
 
 uniform float uMaterialShininess;
 
@@ -28,9 +29,12 @@ void main(void) {
 	vec3 normal = normalize(vTransformedNormal);
 	vec3 eyeDirection = normalize(-vPosition.xyz);
 
-	vec3 bump = normal;
-	if (uEnableNormalMap > 0) {
-		bump = normalize(texture2D(uNormalMapSampler, vTextureCoord.st).xyz * 2.0 - 1.0);
+	if (uEnableNormalMap == 1) {
+		vec3 bump = normalize(texture2D(uNormalMapSampler, vTextureCoord.st).xyz * 2.0 - 1.0);
+		vec3 tangent = normalize(vTangent);
+		vec3 ncrosst = normalize(cross(normal, tangent));
+		mat3 basis = mat3(normal, tangent, ncrosst);
+		normal = basis * bump;
 	}
 
 	for (int i = 0; i < MAX_LIGHTS; ++i) {
