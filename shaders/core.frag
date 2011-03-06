@@ -42,8 +42,11 @@ void main(void) {
 		vec3 lightDirection = normalize(uLightPositions[i] - vPosition.xyz);
 		float diffuse = max(dot(normal, lightDirection), 0.0);
 
-		vec3 reflectionDirection = reflect(-lightDirection, normal);
-		float specular = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess);
+		float specular = 0.0;
+		if (uMaterialShininess < 1000.0) {
+			vec3 reflectionDirection = reflect(-lightDirection, normal);
+			float specular = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess);
+		}
 
 		// Attenuation
 		float attenuation = 1.0;

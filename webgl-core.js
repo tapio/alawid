@@ -239,6 +239,7 @@ if (tangents.length == 12) {
 // Lighting
 
 var lights = [];
+var NO_SPECULAR = 1000.0; // Shininess value that will disable specular color
 
 function PointLight(position, diffuse, attenuation, specular) {
 	this.position = position;

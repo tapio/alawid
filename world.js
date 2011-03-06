@@ -190,7 +190,7 @@ function World() {
 		gl.uniform1i(curProg.normalMapSamplerUniform, 1);
 		// Floor
 		gl.uniform1i(curProg.enableNormalMapUniform, 1);
-		gl.uniform1f(curProg.materialShininessUniform, 10000.0);
+		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, textures["floor"]);
 		gl.activeTexture(gl.TEXTURE1);
