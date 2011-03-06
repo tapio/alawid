@@ -26,7 +26,7 @@ function DungeonMap(w, h) {
 		// Some walls
 		this.placeRandomly("#", w*h/8);
 		// Some lights
-		this.placeRandomly("*", 8);
+		this.placeRandomly("*", w*h/30);
 	}
 
 	this.generate(w, h);
@@ -56,7 +56,7 @@ function DungeonMap(w, h) {
 
 
 function World() {
-	const s = 15.0;
+	const s = 25.0;
 	// Create floor
 	{
 		var vertices = [

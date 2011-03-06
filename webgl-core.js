@@ -239,7 +239,8 @@ if (tangents.length == 12) {
 // Lighting
 
 var lights = [];
-var NO_SPECULAR = 1000.0; // Shininess value that will disable specular color
+const NO_SPECULAR = 1000.0; // Shininess value that will disable specular color
+const MAX_LIGHTS = 10;
 
 function PointLight(position, diffuse, attenuation, specular) {
 	this.position = position;
@@ -251,8 +252,16 @@ function PointLight(position, diffuse, attenuation, specular) {
 function setLightUniforms() {
 	var ambient = vec3.create([0.1, 0.1, 0.1]);
 	gl.uniform3f(curProg.ambientColorUniform, ambient[0], ambient[1], ambient[2]);
-	var lightCount = Math.min(lights.length, 12);
+	var lightCount = Math.min(lights.length, MAX_LIGHTS);
 	gl.uniform1i(curProg.lightCountUniform, lightCount);
+
+	function sortLights(a, b) {
+		var da = Math.abs(player.pos[0] - a.position[0]) + Math.abs(player.pos[1] - a.position[1]);
+		var db = Math.abs(player.pos[0] - b.position[0]) + Math.abs(player.pos[1] - b.position[1]);
+		return da - db;
+	}
+
+	if (lightCount < lights.length) lights.sort(sortLights);
 
 	var position = [], diffuse = [], specular = [], attenuation = [];
 	for (var i = 0; i < lightCount; ++i) {
