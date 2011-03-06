@@ -289,3 +289,6 @@ function degToRad(degrees) {
 	return degrees * Math.PI / 180;
 }
 
+function rand(lo, hi) {
+	return lo + Math.floor(Math.random() * (hi - lo + 1));
+}

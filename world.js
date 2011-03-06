@@ -18,15 +18,60 @@ function DungeonMap(w, h) {
 		for (var j = 0; j < h; ++j) {
 			for (var i = 0; i < w; ++i) {
 				this.levelData.push([]);
-				if (i == 0 || j == 0 || i == w-1 || j == h-1)
+				//if (i == 0 || j == 0 || i == w-1 || j == h-1)
 					this.levelData[j].push("#");
-				else this.levelData[j].push(" ");
+				//else this.levelData[j].push(" ");
 			}
 		}
-		// Some walls
-		this.placeRandomly("#", w*h/8);
+
+		var roomsize = rand(3,4);
+		var rooms = Math.floor(w * h / (roomsize * roomsize * 4)); //rand(10, Math.max(3, Math.floor(Math.pow((w*h),0.4))));
+		var x, y, ox, oy;
+
+		// Pick a starting position
+		while (true) {
+			x = rand(roomsize+1, w-roomsize-1);
+			y = rand(roomsize+1, h-roomsize-1);
+			if (this.levelData[y][x] == "#") break;
+		}
+		this.startx = x; this.starty = y;
+
+		// Create rooms
+		for (var room = 0; room < rooms; ++room) {
+			var rw = rand(2, roomsize);
+			var rh = rand(2, roomsize);
+			var xx = x - rand(0, rw-1);
+			var yy = y - rand(0, rh-1);
+
+			// Floor for the room
+			for (var j = yy; j < yy + rh; ++j) {
+				for (var i = xx; i < xx + rw; ++i) {
+					this.levelData[j][i] = " ";
+				}
+			}
+			ox = x; oy = y;
+
+			// Don't create a dead end corridor
+			if (room == rooms-1) break;
+
+			// Pick new room location
+			while (true) {
+				x = rand(roomsize+1, w-roomsize-1);
+				y = rand(roomsize+1, h-roomsize-1);
+				if (this.levelData[y][x] == "#" && Math.abs(ox-x) + Math.abs(oy-y) < 30)
+					break;
+			}
+			// Do corridors
+			var swapx = x < ox;
+			for (var i = swapx ? x : ox; i < (swapx ? ox : x); ++i)
+				this.levelData[oy][i] = " ";
+			var swapy = y < oy;
+			for (var j = swapy ? y : oy; j < (swapy ? oy : y); ++j)
+				this.levelData[x][j] = " ";
+		}
+
 		// Some lights
-		this.placeRandomly("*", w*h/30);
+		this.placeRandomly("*", rooms);
 	}
 
 	this.generate(w, h);
@@ -56,7 +101,7 @@ function DungeonMap(w, h) {
 
 
 function World() {
-	const s = 25.0;
+	const s = 35.0;
 	// Create floor
 	{
 		var vertices = [

@@ -155,9 +155,9 @@
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
 
-		player = new Actor("player", [2, 2, 0], "player");
-		lights[0] = new PointLight(player.pos);
+		lights[0] = new PointLight();
 		world = new World();
+		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
 
 		tick();
 	}
