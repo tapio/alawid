@@ -32,10 +32,7 @@ function Actor(type, pos, texture) {
 		mvPushMatrix();
 		mat4.translate(mvMatrix, this.pos);
 		gl.disable(gl.DEPTH_TEST);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, textures[this.texture]);
-		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, textures[this.texture + "_normalmap"]);
+		useTexture(this.texture);
 		this.buffer.draw();
 		gl.enable(gl.DEPTH_TEST);
 		mvPopMatrix();

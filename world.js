@@ -214,17 +214,11 @@ function World() {
 	this.draw = function() {
 		// Floor
 		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, textures["floor"]);
-		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, textures["floor_normalmap"]);
+		useTexture("floor");
 		this.floorBuffer.draw();
 		// Walls
 		gl.uniform1f(curProg.materialShininessUniform, 32.0);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, textures["wall"]);
-		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, textures["wall_normalmap"]);
+		useTexture("wall");
 		this.wallBuffer.draw();
 	}
 }

@@ -98,6 +98,15 @@ function loadTexture(file) {
 	return texture;
 }
 
+function useTexture(name) {
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, textures[name]);
+	if (textures[name + "_normalmap"]) {
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, textures[name + "_normalmap"]);
+	}
+}
+
 
 // Matrix stuff (ModelView, Projection)
 
