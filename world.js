@@ -1,4 +1,42 @@
 
+function DungeonMap() {
+	this.levelData = [
+		"##########",
+		"# #      #",
+		"#  ##  * #",
+		"#     #  #",
+		"#  #     #",
+		"#   # #  #",
+		"# #      #",
+		"#   #  # #",
+		"#  #    *#",
+		"##########"
+		];
+
+	this.getBlock = function(pos) {
+		var x = Math.round(pos[0]), y = Math.round(pos[1]);
+		if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
+			return " ";
+		return this.levelData[y][x];
+	}
+
+	this.isWall = function(pos) {
+		const margin = 0.3;
+		var xx = [pos[0] - margin, pos[0] + margin, pos[0] - margin, pos[0] + margin];
+		var yy = [pos[1] - margin, pos[1] - margin, pos[1] + margin, pos[1] + margin];
+		for (var i = 0; i < xx.length; ++i) {
+			var x = Math.round(xx[i]), y = Math.round(yy[i]);
+			if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
+				return true;
+			var c = this.levelData[y][x];
+			if (c != " " && c != "*") return true;
+		}
+		return false;
+	}
+
+}
+
+
 function World() {
 
 	// Create floor
@@ -27,7 +65,6 @@ function World() {
 			];
 	}
 	this.floorBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
-
 
 	this.createWallBuffer = function(data) {
 		var vertices = [], texcoords = [], normals = [], indices = [];
@@ -153,37 +190,8 @@ function World() {
 		this.wallBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
 	}
 
-	this.setLevel = function(data) {
-		this.levelData = data;
-		this.createWallBuffer(data);
-	}
-
-	this.setLevel([
-		"##########",
-		"# #      #",
-		"#  ##  * #",
-		"#     #  #",
-		"#  #     #",
-		"#   # #  #",
-		"# #      #",
-		"#   #  # #",
-		"#  #    *#",
-		"##########"
-		]);
-
-	this.isWall = function(pos) {
-		const margin = 0.3;
-		var xx = [pos[0] - margin, pos[0] + margin, pos[0] - margin, pos[0] + margin];
-		var yy = [pos[1] - margin, pos[1] - margin, pos[1] + margin, pos[1] + margin];
-		for (var i = 0; i < xx.length; ++i) {
-			var x = Math.round(xx[i]), y = Math.round(yy[i]);
-			if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
-				return true;
-			var c = this.levelData[y][x];
-			if (c != " " && c != "*") return true;
-		}
-		return false;
-	}
+	this.map = new DungeonMap();
+	this.createWallBuffer(this.map.levelData);
 
 	this.draw = function() {
 		gl.uniform1i(curProg.textureSamplerUniform, 0);
