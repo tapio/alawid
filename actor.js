@@ -32,6 +32,7 @@ function Actor(type, pos, texture) {
 		mvPushMatrix();
 		mat4.translate(mvMatrix, this.pos);
 		gl.disable(gl.DEPTH_TEST);
+		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
 		useTexture(this.texture);
 		this.buffer.draw();
 		gl.enable(gl.DEPTH_TEST);

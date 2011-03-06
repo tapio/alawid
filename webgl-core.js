@@ -245,17 +245,16 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 var lights = [];
 const NO_SPECULAR = 1000.0; // Shininess value that will disable specular color
 const MAX_LIGHTS = 10;
+const AMBIENT_LIGHT = [0.05, 0.05, 0.05];
 
 function PointLight(position, diffuse, attenuation, specular) {
 	this.position = position;
 	this.diffuse = diffuse || vec3.create([0.9, 0.6, 0.1]);
-	this.attenuation = attenuation || vec3.create([0.0, 0.0, 10.0]);
+	this.attenuation = attenuation || vec3.create([0.0, 0.0, 2.0]);
 	this.specular = specular || vec3.create([1.0, 0.7, 0.2]);
 }
 
 function setLightUniforms() {
-	var ambient = vec3.create([0.1, 0.1, 0.1]);
-	gl.uniform3f(curProg.ambientColorUniform, ambient[0], ambient[1], ambient[2]);
 	var lightCount = Math.min(lights.length, MAX_LIGHTS);
 	gl.uniform1i(curProg.lightCountUniform, lightCount);
 
@@ -281,6 +280,7 @@ function setLightUniforms() {
 	gl.uniform3fv(curProg.lightDiffuseUniform, diffuse);
 	gl.uniform3fv(curProg.lightSpecularUniform, specular);
 	gl.uniform3fv(curProg.lightAttenuationUniform, attenuation);
+	gl.uniform3f(curProg.ambientColorUniform, AMBIENT_LIGHT[0], AMBIENT_LIGHT[1], AMBIENT_LIGHT[2]);
 }
 
 // Utilities

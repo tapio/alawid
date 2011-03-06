@@ -94,6 +94,13 @@
 
 		// Camera
 		vec3.lerp(cameraPos, player.pos, 0.1);
+		/*var dx = cameraPos[0] - player.pos[0];
+		var dy = player.pos[1] - cameraPos[1];
+		var dist = Math.sqrt(dx*dx + dy*dy);
+		if (dist > 0.01) {
+			dist = Math.min(dist, 1.0);
+			mat4.rotate(mvMatrix, -degToRad(35.0 * dist), [dy, dx, 0]);
+		}*/
 		cameraPos[2] = cameraHeight; // Constant height
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
 
