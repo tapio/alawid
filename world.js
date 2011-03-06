@@ -71,12 +71,6 @@ function World() {
 			0.0, 0.0, 1.0,
 			0.0, 0.0, 1.0
 			];
-		var tangents = [
-			1.0, 0.0, 0.0,
-			1.0, 0.0, 0.0,
-			1.0, 0.0, 0.0,
-			1.0, 0.0, 0.0
-			];
 		var texcoords = [
 			0.0, 0.0,
 			s, 0.0,
@@ -87,7 +81,7 @@ function World() {
 			0, 1, 2,    0, 2, 3
 			];
 	}
-	this.floorBuffer = new VertexBuffer(vertices, texcoords, normals, indices, tangents);
+	this.floorBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
 
 	this.createWallBuffer = function(data) {
 		var vertices = [], texcoords = [], normals = [], indices = [];

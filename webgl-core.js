@@ -129,7 +129,7 @@ function setMatrixUniforms() {
 
 // Vetex buffer object capable of drawing itself
 
-function VertexBuffer(vertices, texcoords, normals, indices, tangs) {
+function VertexBuffer(vertices, texcoords, normals, indices) {
 	this.positionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -151,9 +151,6 @@ function VertexBuffer(vertices, texcoords, normals, indices, tangs) {
 	// Generate tangents
 	// Based on http://www.terathon.com/code/tangent.html
 	var tangents = [];
-if (tangs) {
-	tangents = tangs;
-} else {
 	// Initialize empty tangent array
 	for (var i = 0; i < vertices.length; ++i) tangents.push(0.0);
 	// Loop the triangles
@@ -177,9 +174,6 @@ if (tangs) {
 		var sx = (t2 * v2[0] - t1 * v3[0]) * r;
 		var sy = (t2 * v2[1] - t1 * v3[1]) * r;
 		var sz = (t2 * v2[2] - t1 * v3[2]) * r;
-if (vertices.length < 16)
-		console.log(r, sx, sy, sz);
-
 		// Apply calculation results
 		tangents[i1*3+0] += sx;
 		tangents[i1*3+1] += sy;
@@ -191,6 +185,7 @@ if (vertices.length < 16)
 		tangents[i3*3+1] += sy;
 		tangents[i3*3+2] += sz;
 	}
+	/*
 	for (var i = 0; i < vertices.length / 3; ++i) {
 		var t = vec3.create([tangents[i*3], tangents[i*3+1], tangents[i*3+2]]);
 		var n = vec3.create([normals[i*3], normals[i*3+1], normals[i*3+2]]);
@@ -202,11 +197,8 @@ if (vertices.length < 16)
 		tangents[i*3+1] = t[1];
 		tangents[i*3+2] = t[2];
 	}
-}
-if (tangents.length == 12) {
-	for (var i = 0; i < 4; i++)
-		console.log(tangents[i*3+0], tangents[i*3+1], tangents[i*3+2]);
-}
+	*/
+
 	this.tangentBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.tangentBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tangents), gl.STATIC_DRAW);
@@ -249,7 +241,7 @@ function PointLight(position, diffuse, attenuation, specular) {
 	this.position = position;
 	this.diffuse = diffuse || vec3.create([0.9, 0.6, 0.1]);
 	this.attenuation = attenuation || vec3.create([0.0, 0.0, 10.0]);
-	this.specular = specular || vec3.create([1.0, 1.0, 1.0]);
+	this.specular = specular || vec3.create([1.0, 0.7, 0.2]);
 }
 
 function setLightUniforms() {
