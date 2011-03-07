@@ -108,115 +108,65 @@ function DungeonMap(w, h) {
 function World() {
 	const s = 35.0;
 	// Create floor
-	{
-		var vertices = [
-			-0.5, -0.5, 0.0,
-			s-.5, -0.5, 0.0,
-			s-.5, s-.5, 0.0,
-			-0.5, s-.5, 0.0
+	var floorvertices = [
+		-0.5, -0.5, 0.0,
+		s-.5, -0.5, 0.0,
+		s-.5, s-.5, 0.0,
+		-0.5, s-.5, 0.0
+		];
+	var floortexcoords = [
+		0.0, 0.0,
+		s, 0.0,
+		s, s,
+		0.0, s,
+		];
+	var floorindices = [
+		0, 1, 2,    0, 2, 3
+		];
+	this.floorBuffer = new VertexBuffer(floorvertices, floortexcoords, floorindices);
+
+	this.createWallFace = function(p0, p1) {
+		var k = this.vertices.length / 3;
+		var va = [], ta = [], ia = [];
+		va = [
+			p0[0], p0[1], 0.0,
+			p0[0], p0[1], this.wallHeight,
+			p1[0], p1[1], this.wallHeight,
+			p1[0], p1[1], 0.0,
 			];
-		var texcoords = [
+		ta = [
 			0.0, 0.0,
-			s, 0.0,
-			s, s,
-			0.0, s,
-			];
-		var indices = [
-			0, 1, 2,    0, 2, 3
-			];
+			this.wallHeight, 0.0,
+			this.wallHeight, 1.0,
+			0.0, 1.0,
+		];
+		ia = [
+			0+k, 1+k, 2+k,      0+k, 2+k, 3+k
+		];
+		this.vertices = this.vertices.concat(va);
+		this.texcoords = this.texcoords.concat(ta);
+		this.indices = this.indices.concat(ia);
 	}
-	this.floorBuffer = new VertexBuffer(vertices, texcoords, indices);
 
 	this.createWallBuffer = function(data) {
-		var wallheight = Math.abs(cameraHeight) + 1.0;
-		var vertices = [], texcoords = [], normals = [], indices = [];
+		this.wallHeight = Math.abs(cameraHeight) + 1.0;
+		this.vertices = []; this.texcoords = []; this.indices = [];
 		for (var j = 0; j < data.length; ++j) {
 			var row = data[j];
 			for (var i = 0; i < row.length; ++i) {
 				var c = row[i];
 				if (c == "*") {
-					lights.push(new PointLight([i, j, Math.random((wallheight-1) * 0.9) + 1]));
+					lights.push(new PointLight([i, j, Math.random((this.wallHeight-1) * 0.9) + 1]));
 				} else if (c == '#') {
-					var cubeVertices = [
-						// Front face
-						-0.5+i, -0.5+j, wallheight,
-						 0.5+i, -0.5+j, wallheight,
-						 0.5+i,  0.5+j, wallheight,
-						-0.5+i,  0.5+j, wallheight,
-						// Back face
-						-0.5+i, -0.5+j, 0.0,
-						-0.5+i,  0.5+j, 0.0,
-						 0.5+i,  0.5+j, 0.0,
-						 0.5+i, -0.5+j, 0.0,
-						// Top face
-						-0.5+i,  0.5+j, 0.0,
-						-0.5+i,  0.5+j, wallheight,
-						 0.5+i,  0.5+j, wallheight,
-						 0.5+i,  0.5+j, 0.0,
-						// Bottom face
-						-0.5+i, -0.5+j, 0.0,
-						 0.5+i, -0.5+j, 0.0,
-						 0.5+i, -0.5+j, wallheight,
-						-0.5+i, -0.5+j, wallheight,
-						// Right face
-						 0.5+i, -0.5+j, 0.0,
-						 0.5+i,  0.5+j, 0.0,
-						 0.5+i,  0.5+j, wallheight,
-						 0.5+i, -0.5+j, wallheight,
-						// Left face
-						-0.5+i, -0.5+j, 0.0,
-						-0.5+i, -0.5+j, wallheight,
-						-0.5+i,  0.5+j, wallheight,
-						-0.5+i,  0.5+j, 0.0,
-					];
-					var cubeTexcoords = [
-						// Front face
-						0.0, 0.0,
-						1.0, 0.0,
-						1.0, 1.0,
-						0.0, 1.0,
-						// Back face
-						1.0, 0.0,
-						1.0, 1.0,
-						0.0, 1.0,
-						0.0, 0.0,
-						// Top face
-						0.0, wallheight,
-						0.0, 0.0,
-						1.0, 0.0,
-						1.0, wallheight,
-						// Bottom face
-						1.0, wallheight,
-						0.0, wallheight,
-						0.0, 0.0,
-						1.0, 0.0,
-						// Right face
-						wallheight, 0.0,
-						wallheight, 1.0,
-						0.0, 1.0,
-						0.0, 0.0,
-						// Left face
-						0.0, 0.0,
-						wallheight, 0.0,
-						wallheight, 1.0,
-						0.0, 1.0,
-					];
-					var k = vertices.length / 3; // Offset
-					var cubeIndices = [
-						0+k, 1+k, 2+k,      0+k, 2+k, 3+k,    // Front face
-						4+k, 5+k, 6+k,      4+k, 6+k, 7+k,    // Back face
-						8+k, 9+k, 10+k,     8+k, 10+k, 11+k,  // Top face
-						12+k, 13+k, 14+k,   12+k, 14+k, 15+k, // Bottom face
-						16+k, 17+k, 18+k,   16+k, 18+k, 19+k, // Right face
-						20+k, 21+k, 22+k,   20+k, 22+k, 23+k  // Left face
-					];
-					vertices = vertices.concat(cubeVertices);
-					texcoords = texcoords.concat(cubeTexcoords);
-					indices = indices.concat(cubeIndices);
+					this.createWallFace([ 0.5+i, -0.5+j], [-0.5+i, -0.5+j]);
+					this.createWallFace([ 0.5+i,  0.5+j], [ 0.5+i, -0.5+j]);
+					this.createWallFace([-0.5+i,  0.5+j], [ 0.5+i,  0.5+j]);
+					this.createWallFace([-0.5+i, -0.5+j], [-0.5+i,  0.5+j]);
 				}
 			}
 		}
-		this.wallBuffer = new VertexBuffer(vertices, texcoords, indices);
+		this.wallBuffer = new VertexBuffer(this.vertices, this.texcoords, this.indices);
+		this.vertices = []; this.texcoords = []; this.indices = [];
 	}
 
 	this.map = new DungeonMap(s, s);
