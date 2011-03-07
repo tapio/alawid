@@ -175,22 +175,22 @@ function World() {
 					var nw = [-halfGrid, -halfGrid], ne = [ halfGrid, -halfGrid];
 					var sw = [-halfGrid,  halfGrid], se = [ halfGrid,  halfGrid];
 					// Adjust corner according to neighbouring walls
-					if (this.map.getBlock([i-1, j]) == " ") {
+					if (this.map.getBlock([i-1, j]) != "#") {
 						nw[0] += wallMargin;
 						sw[0] += wallMargin;
 						west = true;
 					}
-					if (this.map.getBlock([i+1, j]) == " ") {
+					if (this.map.getBlock([i+1, j]) != "#") {
 						ne[0] -= wallMargin;
 						se[0] -= wallMargin;
 						east = true;
 					}
-					if (this.map.getBlock([i, j-1]) == " ") {
+					if (this.map.getBlock([i, j-1]) != "#") {
 						ne[1] += wallMargin;
 						nw[1] += wallMargin;
 						north = true;
 					}
-					if (this.map.getBlock([i, j+1]) == " ") {
+					if (this.map.getBlock([i, j+1]) != "#") {
 						se[1] -= wallMargin;
 						sw[1] -= wallMargin;
 						south = true;
