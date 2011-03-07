@@ -1,4 +1,4 @@
-#define MAX_LIGHTS 10
+#define MAX_LIGHTS 8
 
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;

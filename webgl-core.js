@@ -33,7 +33,8 @@ function createShader(gl, source, type) {
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
 	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		alert(gl.getShaderInfoLog(shader));
+		alert((type == gl.VERTEX_SHADER ? "Vertex" : "Fragment")
+			+ " shader compilation failed!\n" + gl.getShaderInfoLog(shader));
 		return null;
 	}
 	return shader;
@@ -48,7 +49,7 @@ function createProgram(vertexShaderFile, fragmentShaderFile) {
 	gl.linkProgram(program);
 
 	if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-		alert("Could not initialise shaders");
+		alert("Could not initialize shaders!\n" + gl.getProgramInfoLog(program));
 
 	program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
 	gl.enableVertexAttribArray(program.vertexPositionAttribute);
@@ -260,7 +261,7 @@ function VertexBuffer(vertices, texcoords, indices) {
 
 var lights = [];
 const NO_SPECULAR = 1000.0; // Shininess value that will disable specular color
-const MAX_LIGHTS = 10;
+const MAX_LIGHTS = 8;
 const AMBIENT_LIGHT = [0.05, 0.05, 0.05];
 
 function PointLight(position, diffuse, attenuation, specular) {

@@ -2,7 +2,7 @@
 precision highp float;
 #endif
 
-#define MAX_LIGHTS 10
+#define MAX_LIGHTS 8
 
 uniform float uMaterialShininess;
 
