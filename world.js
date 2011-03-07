@@ -107,6 +107,8 @@ function DungeonMap(w, h) {
 
 function World() {
 	const s = 35.0;
+	const wallMargin = 0.2;
+	const halfGrid = 0.5;
 	// Create floor
 	var floorvertices = [
 		-0.5, -0.5, 0.0,
@@ -125,27 +127,34 @@ function World() {
 		];
 	this.floorBuffer = new VertexBuffer(floorvertices, floortexcoords, floorindices);
 
-	this.createWallFace = function(p0, p1) {
-		var k = this.vertices.length / 3;
+	this.createWallFace = function(p0, p1, n) {
+		const slices = 3;
 		var va = [], ta = [], ia = [];
-		va = [
-			p0[0], p0[1], 0.0,
-			p0[0], p0[1], this.wallHeight,
-			p1[0], p1[1], this.wallHeight,
-			p1[0], p1[1], 0.0,
+		var r0 = 0.0;
+		for (var i = 0; i < slices; ++i) {
+			var f0 = i / slices, f1 = (i+1) / slices;
+			var q0 = [(p1[0]-p0[0])*f0+p0[0], (p1[1]-p0[1])*f0+p0[1]];
+			var q1 = [(p1[0]-p0[0])*f1+p0[0], (p1[1]-p0[1])*f1+p0[1]];
+			var r1 = (i == slices-1) ? 0.0 : Math.random();
+			va = [
+				q0[0]+r0*n[0], q0[1]+r0*n[1], 0.0,
+				q0[0]+r0*n[0], q0[1]+r0*n[1], this.wallHeight,
+				q1[0]+r1*n[0], q1[1]+r1*n[1], this.wallHeight,
+				q1[0]+r1*n[0], q1[1]+r1*n[1], 0.0,
+				];
+			ta = [
+				0.0, f0,
+				this.wallHeight, f0,
+				this.wallHeight, f1,
+				0.0, f1,
 			];
-		ta = [
-			0.0, 0.0,
-			this.wallHeight, 0.0,
-			this.wallHeight, 1.0,
-			0.0, 1.0,
-		];
-		ia = [
-			0+k, 1+k, 2+k,      0+k, 2+k, 3+k
-		];
-		this.vertices = this.vertices.concat(va);
-		this.texcoords = this.texcoords.concat(ta);
-		this.indices = this.indices.concat(ia);
+			r0 = r1;
+			var k = this.vertices.length / 3;
+			ia = [ 0+k, 1+k, 2+k,    0+k, 2+k, 3+k ];
+			this.vertices = this.vertices.concat(va);
+			this.texcoords = this.texcoords.concat(ta);
+			this.indices = this.indices.concat(ia);
+		}
 	}
 
 	this.createWallBuffer = function(data) {
@@ -158,10 +167,39 @@ function World() {
 				if (c == "*") {
 					lights.push(new PointLight([i, j, Math.random((this.wallHeight-1) * 0.9) + 1]));
 				} else if (c == '#') {
-					this.createWallFace([ 0.5+i, -0.5+j], [-0.5+i, -0.5+j]);
-					this.createWallFace([ 0.5+i,  0.5+j], [ 0.5+i, -0.5+j]);
-					this.createWallFace([-0.5+i,  0.5+j], [ 0.5+i,  0.5+j]);
-					this.createWallFace([-0.5+i, -0.5+j], [-0.5+i,  0.5+j]);
+					// Corner points
+					var north, south, west, east;
+					var nw = [-halfGrid, -halfGrid], ne = [ halfGrid, -halfGrid];
+					var sw = [-halfGrid,  halfGrid], se = [ halfGrid,  halfGrid];
+					// Adjust corner according to neighbouring walls
+					if (this.map.getBlock([i-1, j]) == " ") {
+						nw[0] += wallMargin;
+						sw[0] += wallMargin;
+						west = true;
+					}
+					if (this.map.getBlock([i+1, j]) == " ") {
+						ne[0] -= wallMargin;
+						se[0] -= wallMargin;
+						east = true;
+					}
+					if (this.map.getBlock([i, j-1]) == " ") {
+						ne[1] += wallMargin;
+						nw[1] += wallMargin;
+						north = true;
+					}
+					if (this.map.getBlock([i, j+1]) == " ") {
+						se[1] -= wallMargin;
+						sw[1] -= wallMargin;
+						south = true;
+					}
+					// Position in grid
+					nw = [nw[0]+i, nw[1]+j]; ne = [ne[0]+i, ne[1]+j];
+					sw = [sw[0]+i, sw[1]+j]; se = [se[0]+i, se[1]+j];
+					// Create the faces
+					if (north) this.createWallFace(ne, nw, [0.0, -wallMargin]); // North wall
+					if (east ) this.createWallFace(se, ne, [wallMargin, 0.0]); // East wall
+					if (south) this.createWallFace(sw, se, [0.0, wallMargin]); // South wall
+					if (west ) this.createWallFace(nw, sw, [-wallMargin, 0.0]); // West wall
 				}
 			}
 		}
