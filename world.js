@@ -4,8 +4,8 @@ function DungeonMap(w, h) {
 
 	this.placeRandomly = function(what, howmany, nextToWall) {
 		while (howmany > 0) {
-			var i = Math.floor(Math.random() * (this.width()-2)) + 1;
-			var j = Math.floor(Math.random() * (this.height()-2)) + 1;
+			var i = rand(1, this.width()-2);
+			var j = rand(1, this.height()-2);
 			if (this.levelData[j][i] == " ") {
 				if (!nextToWall
 					|| this.levelData[j-1][i] == "#" || this.levelData[j+1][i] == "#"
@@ -15,6 +15,14 @@ function DungeonMap(w, h) {
 					--howmany;
 				}
 			}
+		}
+	}
+
+	this.findEmpty = function() {
+		while (true) {
+			x = rand(1, this.width()-2);
+			y = rand(1, this.height()-2);
+			if (this.levelData[y][x] != "#") return vec3.create([x, y, 0.0]);
 		}
 	}
 
@@ -212,6 +220,8 @@ function World() {
 			}
 		}
 		this.wallBuffer = new VertexBuffer(this.vertices, this.texcoords, this.indices);
+		console.log("Vertices: ~" + this.vertices.length / 3);
+		console.log("Triangles: ~" + this.indices.length / 3);
 		this.vertices = []; this.texcoords = []; this.indices = [];
 	}
 

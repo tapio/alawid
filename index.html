@@ -40,6 +40,7 @@
 
 	var player;
 	var world;
+	var monsters = [];
 
 	// Key handling
 
@@ -68,6 +69,13 @@
 		} else if (pressedKeys[40] || pressedKeys[83]) { // Down cursor key
 			vec3.add(player.pos, [0,  0.1, 0]);
 		}
+
+		// Monster AI
+		if (player.pos[0] != oldpos[0] || player.pos[1] != oldpos[1]) {
+			for (var i = 0; i < monsters.length; ++i)
+				monsters[i].ai();
+		}
+
 		if (world.map.isWall(player.pos)) player.pos = oldpos;
 	}
 
@@ -110,8 +118,9 @@
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
 		world.draw();
-
 		player.draw();
+		for (var i = 0; i < monsters.length; ++i)
+			monsters[i].draw();
 	}
 
 
@@ -160,6 +169,9 @@
 		lights[0] = new PointLight();
 		world = new World();
 		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
+		for (var i = 0; i < 10; ++i) {
+			monsters.push(new Actor("monster", world.map.findEmpty(), "player"));
+		}
 
 		tick();
 	}
