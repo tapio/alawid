@@ -40,6 +40,7 @@
 
 	var player;
 	var world;
+	var monsters = [];
 
 	// Key handling
 
@@ -54,21 +55,22 @@
 	}
 
 	function handleKeys() {
-		var oldpos = vec3.create(player.pos);
-		if (pressedKeys[37] || pressedKeys[65]) { // Left cursor key or A
-			vec3.add(player.pos, [-0.1, 0, 0]);
-		} else if (pressedKeys[39] || pressedKeys[68]) { // Right cursor key or D
-			vec3.add(player.pos, [ 0.1, 0, 0]);
-		}
-		if (world.map.isWall(player.pos)) player.pos = oldpos;
+		if (!player.moving) {
+			var dx = 0, dy = 0;
 
-		oldpos = vec3.create(player.pos);
-		if (pressedKeys[38] || pressedKeys[87]) { // Up cursor key or W
-			vec3.add(player.pos, [0, -0.1, 0]);
-		} else if (pressedKeys[40] || pressedKeys[83]) { // Down cursor key
-			vec3.add(player.pos, [0,  0.1, 0]);
+			if (pressedKeys[37] || pressedKeys[65]) dx = -1; // Left cursor key or A
+			else if (pressedKeys[39] || pressedKeys[68]) dx = 1; // Right cursor key or D
+			if (pressedKeys[38] || pressedKeys[87]) dy = -1; // Up cursor key or W
+			else if (pressedKeys[40] || pressedKeys[83]) dy = 1; // Down cursor key
+
+			if (!world.map.isWall([player.pos[0]+dx, player.pos[1]+dy])) {
+				player.move([player.pos[0]+dx, player.pos[1]+dy]);
+			}
+
+			// Monster AI
+			for (var i = 0; i < monsters.length; ++i)
+				monsters[i].ai();
 		}
-		if (world.map.isWall(player.pos)) player.pos = oldpos;
 	}
 
 	// Rendering
@@ -105,13 +107,14 @@
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
 
 		 // Lighting
-		lights[0].position = vec3.create([player.pos[0], player.pos[1], 1.0]);
+		lights[0].position = vec3.create([player.pos[0], player.pos[1], 0.5]);
 		setLightUniforms();
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
 		world.draw();
-
 		player.draw();
+		for (var i = 0; i < monsters.length; ++i)
+			monsters[i].draw();
 	}
 
 
@@ -122,11 +125,15 @@
 		if (lastTime != 0) {
 			var elapsed = timeNow - lastTime;
 
+			player.updateMoving();
+			for (var i = 0; i < monsters.length; ++i)
+				monsters[i].updateMoving();
+
 			// Animate lights
 			for (var i = 0; i < lights.length; ++i) {
 				var anim = timeNow / (1000.0 + i);
-				anim = 0.3 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
-				lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
+				anim = 0.5 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
+				lights[i].attenuation = vec3.create([0.0, 0.0, 0.8 + anim]);
 			}
 		}
 		lastTime = timeNow;
@@ -149,8 +156,10 @@
 
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		gl.cullFace(gl.FRONT);
 		gl.enable(gl.BLEND);
 		gl.enable(gl.DEPTH_TEST);
+		gl.enable(gl.CULL_FACE);
 
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
@@ -158,6 +167,9 @@
 		lights[0] = new PointLight();
 		world = new World();
 		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
+		for (var i = 0; i < 10; ++i) {
+			monsters.push(new Actor("monster", world.map.findEmpty(), "player"));
+		}
 
 		tick();
 	}

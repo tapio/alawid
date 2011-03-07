@@ -2,14 +2,27 @@
 function DungeonMap(w, h) {
 	this.levelData = [];
 
-	this.placeRandomly = function(what, howmany) {
+	this.placeRandomly = function(what, howmany, nextToWall) {
 		while (howmany > 0) {
-			var i = Math.floor(Math.random() * this.levelData[0].length);
-			var j = Math.floor(Math.random() * this.levelData.length / this.levelData[0].length);
+			var i = rand(1, this.width()-2);
+			var j = rand(1, this.height()-2);
 			if (this.levelData[j][i] == " ") {
-				this.levelData[j][i] = what;
-				--howmany;
+				if (!nextToWall
+					|| this.levelData[j-1][i] == "#" || this.levelData[j+1][i] == "#"
+					|| this.levelData[j][i-1] == "#" || this.levelData[j][i+1] == "#")
+				{
+					this.levelData[j][i] = what;
+					--howmany;
+				}
 			}
+		}
+	}
+
+	this.findEmpty = function() {
+		while (true) {
+			x = rand(1, this.width()-2);
+			y = rand(1, this.height()-2);
+			if (this.levelData[y][x] != "#") return vec3.create([x, y, 0.0]);
 		}
 	}
 
@@ -67,18 +80,19 @@ function DungeonMap(w, h) {
 				this.levelData[oy][i] = " ";
 			var swapy = y < oy;
 			for (var j = swapy ? y : oy; j < (swapy ? oy : y); ++j)
-				this.levelData[x][j] = " ";
+				this.levelData[j][x] = " ";
 		}
 
 		// Some lights
-		this.placeRandomly("*", rooms);
+		this.placeRandomly("*", rooms/3, true);
 	}
 
-	this.generate(w, h);
+	this.width = function() { return this.levelData[0].length; }
+	this.height = function() { return this.levelData.length / this.levelData[0].length; }
 
 	this.getBlock = function(pos) {
 		var x = Math.round(pos[0]), y = Math.round(pos[1]);
-		if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
+		if (x < 0 || y < 0 || x >= this.width() || y >= this.height())
 			return " ";
 		return this.levelData[y][x];
 	}
@@ -89,7 +103,7 @@ function DungeonMap(w, h) {
 		var yy = [pos[1] - margin, pos[1] - margin, pos[1] + margin, pos[1] + margin];
 		for (var i = 0; i < xx.length; ++i) {
 			var x = Math.round(xx[i]), y = Math.round(yy[i]);
-			if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
+			if (x < 0 || y < 0 || x >= this.width() || y >= this.height())
 				return true;
 			var c = this.levelData[y][x];
 			if (c != " " && c != "*") return true;
@@ -97,160 +111,130 @@ function DungeonMap(w, h) {
 		return false;
 	}
 
+	this.toString = function() {
+		var str = "";
+		for (var j = 0; j < h; ++j) {
+			for (var i = 0; i < w; ++i) {
+				str += this.levelData[j][i];
+			}
+			str += "\n";
+		}
+		return str;
+	}
+
+	this.generate(w, h);
+	console.log(this.toString());
+
 }
 
 
 function World() {
 	const s = 35.0;
+	const wallMargin = 0.2;
+	const halfGrid = 0.5;
 	// Create floor
-	{
-		var vertices = [
-			-0.5, -0.5, 0.0,
-			s-.5, -0.5, 0.0,
-			s-.5, s-.5, 0.0,
-			-0.5, s-.5, 0.0
+	var floorvertices = [
+		-0.5, -0.5, 0.0,
+		s-.5, -0.5, 0.0,
+		s-.5, s-.5, 0.0,
+		-0.5, s-.5, 0.0
+		];
+	var floortexcoords = [
+		0.0, 0.0,
+		s, 0.0,
+		s, s,
+		0.0, s,
+		];
+	var floorindices = [
+		0, 1, 2,    0, 2, 3
+		];
+	this.floorBuffer = new VertexBuffer(floorvertices, floortexcoords, floorindices);
+
+	this.createWallFace = function(p0, p1, n) {
+		const slices = 3;
+		var va = [], ta = [], ia = [];
+		var r0 = 0.0;
+		for (var i = 0; i < slices; ++i) {
+			var f0 = i / slices, f1 = (i+1) / slices;
+			var q0 = [(p1[0]-p0[0])*f0+p0[0], (p1[1]-p0[1])*f0+p0[1]];
+			var q1 = [(p1[0]-p0[0])*f1+p0[0], (p1[1]-p0[1])*f1+p0[1]];
+			var r1 = (i == slices-1) ? 0.0 : Math.random();
+			va = [
+				q0[0]+r0*n[0], q0[1]+r0*n[1], 0.0,
+				q0[0]+r0*n[0], q0[1]+r0*n[1], this.wallHeight,
+				q1[0]+r1*n[0], q1[1]+r1*n[1], this.wallHeight,
+				q1[0]+r1*n[0], q1[1]+r1*n[1], 0.0,
+				];
+			ta = [
+				0.0, f0,
+				this.wallHeight, f0,
+				this.wallHeight, f1,
+				0.0, f1,
 			];
-		var normals = [
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0
-			];
-		var texcoords = [
-			0.0, 0.0,
-			s, 0.0,
-			s, s,
-			0.0, s,
-			];
-		var indices = [
-			0, 1, 2,    0, 2, 3
-			];
+			r0 = r1;
+			var k = this.vertices.length / 3;
+			ia = [ 0+k, 1+k, 2+k,    0+k, 2+k, 3+k ];
+			this.vertices = this.vertices.concat(va);
+			this.texcoords = this.texcoords.concat(ta);
+			this.indices = this.indices.concat(ia);
+		}
 	}
-	this.floorBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
 
 	this.createWallBuffer = function(data) {
-		var vertices = [], texcoords = [], normals = [], indices = [];
+		this.wallHeight = Math.abs(cameraHeight) + 1.0;
+		this.vertices = []; this.texcoords = []; this.indices = [];
 		for (var j = 0; j < data.length; ++j) {
 			var row = data[j];
 			for (var i = 0; i < row.length; ++i) {
 				var c = row[i];
 				if (c == "*") {
-					lights.push(new PointLight([i, j, Math.random(h * 0.5) + 1]));
+					lights.push(new PointLight([i, j, Math.random((this.wallHeight-1) * 0.9) + 1]));
 				} else if (c == '#') {
-					const h = 10.0;
-					var cubeVertices = [
-						// Front face
-						-0.5+i, -0.5+j, h,
-						 0.5+i, -0.5+j, h,
-						 0.5+i,  0.5+j, h,
-						-0.5+i,  0.5+j, h,
-						// Back face
-						-0.5+i, -0.5+j, 0.0,
-						-0.5+i,  0.5+j, 0.0,
-						 0.5+i,  0.5+j, 0.0,
-						 0.5+i, -0.5+j, 0.0,
-						// Top face
-						-0.5+i,  0.5+j, 0.0,
-						-0.5+i,  0.5+j, h,
-						 0.5+i,  0.5+j, h,
-						 0.5+i,  0.5+j, 0.0,
-						// Bottom face
-						-0.5+i, -0.5+j, 0.0,
-						 0.5+i, -0.5+j, 0.0,
-						 0.5+i, -0.5+j, h,
-						-0.5+i, -0.5+j, h,
-						// Right face
-						 0.5+i, -0.5+j, 0.0,
-						 0.5+i,  0.5+j, 0.0,
-						 0.5+i,  0.5+j, h,
-						 0.5+i, -0.5+j, h,
-						// Left face
-						-0.5+i, -0.5+j, 0.0,
-						-0.5+i, -0.5+j, h,
-						-0.5+i,  0.5+j, h,
-						-0.5+i,  0.5+j, 0.0,
-					];
-					var cubeNormals = [
-						// Front face
-						 0.0,  0.0,  1.0,
-						 0.0,  0.0,  1.0,
-						 0.0,  0.0,  1.0,
-						 0.0,  0.0,  1.0,
-						// Back face
-						 0.0,  0.0, -1.0,
-						 0.0,  0.0, -1.0,
-						 0.0,  0.0, -1.0,
-						 0.0,  0.0, -1.0,
-						// Top face
-						 0.0,  1.0,  0.0,
-						 0.0,  1.0,  0.0,
-						 0.0,  1.0,  0.0,
-						 0.0,  1.0,  0.0,
-						// Bottom face
-						 0.0, -1.0,  0.0,
-						 0.0, -1.0,  0.0,
-						 0.0, -1.0,  0.0,
-						 0.0, -1.0,  0.0,
-						// Right face
-						 1.0,  0.0,  0.0,
-						 1.0,  0.0,  0.0,
-						 1.0,  0.0,  0.0,
-						 1.0,  0.0,  0.0,
-						// Left face
-						-1.0,  0.0,  0.0,
-						-1.0,  0.0,  0.0,
-						-1.0,  0.0,  0.0,
-						-1.0,  0.0,  0.0,
-					];
-					var cubeTexcoords = [
-						// Front face
-						0.0, 0.0,
-						1.0, 0.0,
-						1.0, 1.0,
-						0.0, 1.0,
-						// Back face
-						1.0, 0.0,
-						1.0, 1.0,
-						0.0, 1.0,
-						0.0, 0.0,
-						// Top face
-						0.0, h,
-						0.0, 0.0,
-						1.0, 0.0,
-						1.0, h,
-						// Bottom face
-						1.0, h,
-						0.0, h,
-						0.0, 0.0,
-						1.0, 0.0,
-						// Right face
-						h, 0.0,
-						h, 1.0,
-						0.0, 1.0,
-						0.0, 0.0,
-						// Left face
-						0.0, 0.0,
-						h, 0.0,
-						h, 1.0,
-						0.0, 1.0,
-					];
-					var k = vertices.length / 3; // Offset
-					var cubeIndices = [
-						0+k, 1+k, 2+k,      0+k, 2+k, 3+k,    // Front face
-						4+k, 5+k, 6+k,      4+k, 6+k, 7+k,    // Back face
-						8+k, 9+k, 10+k,     8+k, 10+k, 11+k,  // Top face
-						12+k, 13+k, 14+k,   12+k, 14+k, 15+k, // Bottom face
-						16+k, 17+k, 18+k,   16+k, 18+k, 19+k, // Right face
-						20+k, 21+k, 22+k,   20+k, 22+k, 23+k  // Left face
-					];
-					vertices = vertices.concat(cubeVertices);
-					texcoords = texcoords.concat(cubeTexcoords);
-					normals = normals.concat(cubeNormals);
-					indices = indices.concat(cubeIndices);
+					// Corner points
+					var north = false, south = false, west = false, east = false;
+					var nw = [-halfGrid, -halfGrid], ne = [ halfGrid, -halfGrid];
+					var sw = [-halfGrid,  halfGrid], se = [ halfGrid,  halfGrid];
+					// Adjust corner according to neighbouring walls
+					if (this.map.getBlock([i-1, j]) != "#") {
+						nw[0] += wallMargin;
+						sw[0] += wallMargin;
+						west = true;
+					}
+					if (this.map.getBlock([i+1, j]) != "#") {
+						ne[0] -= wallMargin;
+						se[0] -= wallMargin;
+						east = true;
+					}
+					if (this.map.getBlock([i, j-1]) != "#") {
+						ne[1] += wallMargin;
+						nw[1] += wallMargin;
+						north = true;
+					}
+					if (this.map.getBlock([i, j+1]) != "#") {
+						se[1] -= wallMargin;
+						sw[1] -= wallMargin;
+						south = true;
+					}
+					// Fill corners
+					if (this.map.getBlock([i-1, j-1]) != "#") { west = true; north = true; }
+					if (this.map.getBlock([i+1, j-1]) != "#") { east = true; north = true; }
+					if (this.map.getBlock([i-1, j+1]) != "#") { west = true; south = true; }
+					if (this.map.getBlock([i+1, j+1]) != "#") { east = true; south = true; }
+					// Position in grid
+					nw = [nw[0]+i, nw[1]+j]; ne = [ne[0]+i, ne[1]+j];
+					sw = [sw[0]+i, sw[1]+j]; se = [se[0]+i, se[1]+j];
+					// Create the faces
+					if (north) this.createWallFace(ne, nw, [0.0, -wallMargin]); // North wall
+					if (east ) this.createWallFace(se, ne, [wallMargin, 0.0]); // East wall
+					if (south) this.createWallFace(sw, se, [0.0, wallMargin]); // South wall
+					if (west ) this.createWallFace(nw, sw, [-wallMargin, 0.0]); // West wall
 				}
 			}
 		}
-		this.wallBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
+		this.wallBuffer = new VertexBuffer(this.vertices, this.texcoords, this.indices);
+		console.log("Vertices: ~" + this.vertices.length / 3);
+		console.log("Triangles: ~" + this.indices.length / 3);
+		this.vertices = []; this.texcoords = []; this.indices = [];
 	}
 
 	this.map = new DungeonMap(s, s);
