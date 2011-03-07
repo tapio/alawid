@@ -195,6 +195,11 @@ function World() {
 						sw[1] -= wallMargin;
 						south = true;
 					}
+					// Fill corners
+					if (this.map.getBlock([i-1, j-1]) != "#") { west = true; north = true; }
+					if (this.map.getBlock([i+1, j-1]) != "#") { east = true; north = true; }
+					if (this.map.getBlock([i-1, j+1]) != "#") { west = true; south = true; }
+					if (this.map.getBlock([i+1, j+1]) != "#") { east = true; south = true; }
 					// Position in grid
 					nw = [nw[0]+i, nw[1]+j]; ne = [ne[0]+i, ne[1]+j];
 					sw = [sw[0]+i, sw[1]+j]; se = [se[0]+i, se[1]+j];
