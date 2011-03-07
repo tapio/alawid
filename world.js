@@ -4,8 +4,8 @@ function DungeonMap(w, h) {
 
 	this.placeRandomly = function(what, howmany, nextToWall) {
 		while (howmany > 0) {
-			var i = Math.floor(Math.random() * (this.levelData[0].length-2)) + 1;
-			var j = Math.floor(Math.random() * ((this.levelData.length / this.levelData[0].length)-2)) + 1;
+			var i = Math.floor(Math.random() * (this.width()-2)) + 1;
+			var j = Math.floor(Math.random() * (this.height()-2)) + 1;
 			if (this.levelData[j][i] == " ") {
 				if (!nextToWall
 					|| this.levelData[j-1][i] == "#" || this.levelData[j+1][i] == "#"
@@ -79,11 +79,14 @@ function DungeonMap(w, h) {
 		this.placeRandomly("*", rooms/3, true);
 	}
 
+	this.width = function() { return this.levelData[0].length; }
+	this.height = function() { return this.levelData.length / this.levelData[0].length; }
+
 	this.generate(w, h);
 
 	this.getBlock = function(pos) {
 		var x = Math.round(pos[0]), y = Math.round(pos[1]);
-		if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
+		if (x < 0 || y < 0 || x >= this.width() || y >= this.height())
 			return " ";
 		return this.levelData[y][x];
 	}
@@ -94,7 +97,7 @@ function DungeonMap(w, h) {
 		var yy = [pos[1] - margin, pos[1] - margin, pos[1] + margin, pos[1] + margin];
 		for (var i = 0; i < xx.length; ++i) {
 			var x = Math.round(xx[i]), y = Math.round(yy[i]);
-			if (x < 0 || y < 0 || x >= this.levelData[0].length || y >= this.levelData.length)
+			if (x < 0 || y < 0 || x >= this.width() || y >= this.height())
 				return true;
 			var c = this.levelData[y][x];
 			if (c != " " && c != "*") return true;
