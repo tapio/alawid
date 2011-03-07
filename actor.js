@@ -17,16 +17,10 @@ function Actor(type, pos, texture) {
 		1.0, 0.0,
 		0.0, 0.0,
 		];
-	var normals = [
-		0.0, 0.0, 1.0,
-		0.0, 0.0, 1.0,
-		0.0, 0.0, 1.0,
-		0.0, 0.0, 1.0
-		];
 	var indices = [
 		0, 1, 2,    0, 2, 3
 		];
-	this.buffer = new VertexBuffer(vertices, texcoords, normals, indices);
+	this.buffer = new VertexBuffer(vertices, texcoords, indices);
 
 	this.draw = function() {
 		mvPushMatrix();

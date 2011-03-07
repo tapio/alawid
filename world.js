@@ -110,12 +110,6 @@ function World() {
 			s-.5, s-.5, 0.0,
 			-0.5, s-.5, 0.0
 			];
-		var normals = [
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0
-			];
 		var texcoords = [
 			0.0, 0.0,
 			s, 0.0,
@@ -126,7 +120,7 @@ function World() {
 			0, 1, 2,    0, 2, 3
 			];
 	}
-	this.floorBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
+	this.floorBuffer = new VertexBuffer(vertices, texcoords, indices);
 
 	this.createWallBuffer = function(data) {
 		var vertices = [], texcoords = [], normals = [], indices = [];
@@ -169,38 +163,6 @@ function World() {
 						-0.5+i, -0.5+j, h,
 						-0.5+i,  0.5+j, h,
 						-0.5+i,  0.5+j, 0.0,
-					];
-					var cubeNormals = [
-						// Front face
-						 0.0,  0.0,  1.0,
-						 0.0,  0.0,  1.0,
-						 0.0,  0.0,  1.0,
-						 0.0,  0.0,  1.0,
-						// Back face
-						 0.0,  0.0, -1.0,
-						 0.0,  0.0, -1.0,
-						 0.0,  0.0, -1.0,
-						 0.0,  0.0, -1.0,
-						// Top face
-						 0.0,  1.0,  0.0,
-						 0.0,  1.0,  0.0,
-						 0.0,  1.0,  0.0,
-						 0.0,  1.0,  0.0,
-						// Bottom face
-						 0.0, -1.0,  0.0,
-						 0.0, -1.0,  0.0,
-						 0.0, -1.0,  0.0,
-						 0.0, -1.0,  0.0,
-						// Right face
-						 1.0,  0.0,  0.0,
-						 1.0,  0.0,  0.0,
-						 1.0,  0.0,  0.0,
-						 1.0,  0.0,  0.0,
-						// Left face
-						-1.0,  0.0,  0.0,
-						-1.0,  0.0,  0.0,
-						-1.0,  0.0,  0.0,
-						-1.0,  0.0,  0.0,
 					];
 					var cubeTexcoords = [
 						// Front face
@@ -245,12 +207,11 @@ function World() {
 					];
 					vertices = vertices.concat(cubeVertices);
 					texcoords = texcoords.concat(cubeTexcoords);
-					normals = normals.concat(cubeNormals);
 					indices = indices.concat(cubeIndices);
 				}
 			}
 		}
-		this.wallBuffer = new VertexBuffer(vertices, texcoords, normals, indices);
+		this.wallBuffer = new VertexBuffer(vertices, texcoords, indices);
 	}
 
 	this.map = new DungeonMap(s, s);

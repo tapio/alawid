@@ -138,7 +138,7 @@ function setMatrixUniforms() {
 
 // Vetex buffer object capable of drawing itself
 
-function VertexBuffer(vertices, texcoords, normals, indices) {
+function VertexBuffer(vertices, texcoords, indices) {
 	this.positionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -151,17 +151,14 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 	this.texcoordBuffer.itemSize = 2;
 	this.texcoordBuffer.numItems = texcoords.length / 2;
 
-	this.normalBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-	this.normalBuffer.itemSize = 3;
-	this.normalBuffer.numItems = normals.length / 3;
-
-	// Generate tangents
+	// Generate normals and tangents
 	// Based on http://www.terathon.com/code/tangent.html
-	var tangents = [];
-	// Initialize empty tangent array
-	for (var i = 0; i < vertices.length; ++i) tangents.push(0.0);
+	var normals = [], tangents = [];
+	// Initialize empty arrays
+	for (var i = 0; i < vertices.length; ++i) {
+		normals.push(0.0);
+		tangents.push(0.0);
+	}
 	// Loop the triangles
 	for (var i = 0; i < indices.length / 3; ++i) {
 		// Get triangle vertex indices
@@ -173,6 +170,19 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 		// Create vectors out the vertices
 		vec3.subtract(v2, v1);
 		vec3.subtract(v3, v1);
+		// Calculate normal with cross-product
+		var n = vec3.create();
+		vec3.cross(v2, v3, n);
+		// Apply normal calculation results
+		normals[i1*3+0] += n[0];
+		normals[i1*3+1] += n[1];
+		normals[i1*3+2] += n[2];
+		normals[i2*3+0] += n[0];
+		normals[i2*3+1] += n[1];
+		normals[i2*3+2] += n[2];
+		normals[i3*3+0] += n[0];
+		normals[i3*3+1] += n[1];
+		normals[i3*3+2] += n[2];
 		// Texture coord mangling
 		var s1 = texcoords[i2*2] - texcoords[i1*2];
 		var s2 = texcoords[i3*2] - texcoords[i1*2];
@@ -183,7 +193,7 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 		var sx = (t2 * v2[0] - t1 * v3[0]) * r;
 		var sy = (t2 * v2[1] - t1 * v3[1]) * r;
 		var sz = (t2 * v2[2] - t1 * v3[2]) * r;
-		// Apply calculation results
+		// Apply tangent calculation results
 		tangents[i1*3+0] += sx;
 		tangents[i1*3+1] += sy;
 		tangents[i1*3+2] += sz;
@@ -207,6 +217,12 @@ function VertexBuffer(vertices, texcoords, normals, indices) {
 		tangents[i*3+2] = t[2];
 	}
 	*/
+
+	this.normalBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+	this.normalBuffer.itemSize = 3;
+	this.normalBuffer.numItems = normals.length / 3;
 
 	this.tangentBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.tangentBuffer);
