@@ -3,6 +3,8 @@ function Actor(type, pos, texture) {
 	this.type = type;
 	this.pos = pos || vec3.create(0.0, 0.0, 0.0);
 	this.texture = texture;
+	this.target = this.pos;
+	this.moving = false;
 
 	// Create sprite
 	var vertices = [
@@ -23,11 +25,24 @@ function Actor(type, pos, texture) {
 	this.buffer = new VertexBuffer(vertices, texcoords, indices);
 
 	this.ai = function() {
-		var oldpos = vec3.create(this.pos);
-		var dx = Math.random() * 2.0 - 1.0;
-		var dy = Math.random() * 2.0 - 1.0;
-		this.pos = vec3.create([oldpos[0]+dx, oldpos[1]+dy, oldpos[2]]);
-		if (world.map.isWall(this.pos)) this.pos = oldpos;
+		if (this.moving) return;
+		var dx = rand(-1, 1);
+		var dy = rand(-1, 1);
+		var target = vec3.create([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
+		if (!world.map.isWall(target)) this.move(target);
+	}
+
+	this.move = function(target) {
+		this.target = vec3.create(target);
+		this.moving = true;
+	}
+
+	this.updateMoving = function() {
+		vec3.lerp(this.pos, this.target, 0.2);
+		if (Math.abs(this.pos[0]-this.target[0]) + Math.abs(this.pos[1]-this.target[1]) < 0.1) {
+			this.moving = false;
+			this.pos = roundvec(this.pos);
+		}
 	}
 
 	this.draw = function() {

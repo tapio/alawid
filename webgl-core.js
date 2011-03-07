@@ -299,6 +299,7 @@ function setLightUniforms() {
 	gl.uniform3f(curProg.ambientColorUniform, AMBIENT_LIGHT[0], AMBIENT_LIGHT[1], AMBIENT_LIGHT[2]);
 }
 
+
 // Utilities
 
 function degToRad(degrees) {
@@ -307,4 +308,8 @@ function degToRad(degrees) {
 
 function rand(lo, hi) {
 	return lo + Math.floor(Math.random() * (hi - lo + 1));
+}
+
+function roundvec(vec) {
+	return vec3.create([Math.round(vec[0]), Math.round(vec[1]), Math.round(vec[2])]);
 }
