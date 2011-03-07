@@ -105,7 +105,7 @@
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
 
 		 // Lighting
-		lights[0].position = vec3.create([player.pos[0], player.pos[1], 1.0]);
+		lights[0].position = vec3.create([player.pos[0], player.pos[1], 0.5]);
 		setLightUniforms();
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
@@ -125,8 +125,8 @@
 			// Animate lights
 			for (var i = 0; i < lights.length; ++i) {
 				var anim = timeNow / (1000.0 + i);
-				anim = 0.3 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
-				lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
+				anim = 0.5 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
+				lights[i].attenuation = vec3.create([0.0, 0.0, 0.8 + anim]);
 			}
 		}
 		lastTime = timeNow;

@@ -2,13 +2,18 @@
 function DungeonMap(w, h) {
 	this.levelData = [];
 
-	this.placeRandomly = function(what, howmany) {
+	this.placeRandomly = function(what, howmany, nextToWall) {
 		while (howmany > 0) {
-			var i = Math.floor(Math.random() * this.levelData[0].length);
-			var j = Math.floor(Math.random() * this.levelData.length / this.levelData[0].length);
+			var i = Math.floor(Math.random() * (this.levelData[0].length-2)) + 1;
+			var j = Math.floor(Math.random() * ((this.levelData.length / this.levelData[0].length)-2)) + 1;
 			if (this.levelData[j][i] == " ") {
-				this.levelData[j][i] = what;
-				--howmany;
+				if (!nextToWall
+					|| this.levelData[j-1][i] == "#" || this.levelData[j+1][i] == "#"
+					|| this.levelData[j][i-1] == "#" || this.levelData[j][i+1] == "#")
+				{
+					this.levelData[j][i] = what;
+					--howmany;
+				}
 			}
 		}
 	}
@@ -71,7 +76,7 @@ function DungeonMap(w, h) {
 		}
 
 		// Some lights
-		this.placeRandomly("*", rooms);
+		this.placeRandomly("*", rooms/3, true);
 	}
 
 	this.generate(w, h);
@@ -123,21 +128,21 @@ function World() {
 	this.floorBuffer = new VertexBuffer(vertices, texcoords, indices);
 
 	this.createWallBuffer = function(data) {
+		var wallheight = Math.abs(cameraHeight) + 1.0;
 		var vertices = [], texcoords = [], normals = [], indices = [];
 		for (var j = 0; j < data.length; ++j) {
 			var row = data[j];
 			for (var i = 0; i < row.length; ++i) {
 				var c = row[i];
 				if (c == "*") {
-					lights.push(new PointLight([i, j, Math.random(h * 0.5) + 1]));
+					lights.push(new PointLight([i, j, Math.random((wallheight-1) * 0.9) + 1]));
 				} else if (c == '#') {
-					const h = 10.0;
 					var cubeVertices = [
 						// Front face
-						-0.5+i, -0.5+j, h,
-						 0.5+i, -0.5+j, h,
-						 0.5+i,  0.5+j, h,
-						-0.5+i,  0.5+j, h,
+						-0.5+i, -0.5+j, wallheight,
+						 0.5+i, -0.5+j, wallheight,
+						 0.5+i,  0.5+j, wallheight,
+						-0.5+i,  0.5+j, wallheight,
 						// Back face
 						-0.5+i, -0.5+j, 0.0,
 						-0.5+i,  0.5+j, 0.0,
@@ -145,23 +150,23 @@ function World() {
 						 0.5+i, -0.5+j, 0.0,
 						// Top face
 						-0.5+i,  0.5+j, 0.0,
-						-0.5+i,  0.5+j, h,
-						 0.5+i,  0.5+j, h,
+						-0.5+i,  0.5+j, wallheight,
+						 0.5+i,  0.5+j, wallheight,
 						 0.5+i,  0.5+j, 0.0,
 						// Bottom face
 						-0.5+i, -0.5+j, 0.0,
 						 0.5+i, -0.5+j, 0.0,
-						 0.5+i, -0.5+j, h,
-						-0.5+i, -0.5+j, h,
+						 0.5+i, -0.5+j, wallheight,
+						-0.5+i, -0.5+j, wallheight,
 						// Right face
 						 0.5+i, -0.5+j, 0.0,
 						 0.5+i,  0.5+j, 0.0,
-						 0.5+i,  0.5+j, h,
-						 0.5+i, -0.5+j, h,
+						 0.5+i,  0.5+j, wallheight,
+						 0.5+i, -0.5+j, wallheight,
 						// Left face
 						-0.5+i, -0.5+j, 0.0,
-						-0.5+i, -0.5+j, h,
-						-0.5+i,  0.5+j, h,
+						-0.5+i, -0.5+j, wallheight,
+						-0.5+i,  0.5+j, wallheight,
 						-0.5+i,  0.5+j, 0.0,
 					];
 					var cubeTexcoords = [
@@ -176,24 +181,24 @@ function World() {
 						0.0, 1.0,
 						0.0, 0.0,
 						// Top face
-						0.0, h,
+						0.0, wallheight,
 						0.0, 0.0,
 						1.0, 0.0,
-						1.0, h,
+						1.0, wallheight,
 						// Bottom face
-						1.0, h,
-						0.0, h,
+						1.0, wallheight,
+						0.0, wallheight,
 						0.0, 0.0,
 						1.0, 0.0,
 						// Right face
-						h, 0.0,
-						h, 1.0,
+						wallheight, 0.0,
+						wallheight, 1.0,
 						0.0, 1.0,
 						0.0, 0.0,
 						// Left face
 						0.0, 0.0,
-						h, 0.0,
-						h, 1.0,
+						wallheight, 0.0,
+						wallheight, 1.0,
 						0.0, 1.0,
 					];
 					var k = vertices.length / 3; // Offset
