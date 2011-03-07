@@ -80,7 +80,7 @@ function DungeonMap(w, h) {
 				this.levelData[oy][i] = " ";
 			var swapy = y < oy;
 			for (var j = swapy ? y : oy; j < (swapy ? oy : y); ++j)
-				this.levelData[x][j] = " ";
+				this.levelData[j][x] = " ";
 		}
 
 		// Some lights
@@ -89,8 +89,6 @@ function DungeonMap(w, h) {
 
 	this.width = function() { return this.levelData[0].length; }
 	this.height = function() { return this.levelData.length / this.levelData[0].length; }
-
-	this.generate(w, h);
 
 	this.getBlock = function(pos) {
 		var x = Math.round(pos[0]), y = Math.round(pos[1]);
@@ -112,6 +110,20 @@ function DungeonMap(w, h) {
 		}
 		return false;
 	}
+
+	this.toString = function() {
+		var str = "";
+		for (var j = 0; j < h; ++j) {
+			for (var i = 0; i < w; ++i) {
+				str += this.levelData[j][i];
+			}
+			str += "\n";
+		}
+		return str;
+	}
+
+	this.generate(w, h);
+	console.log(this.toString());
 
 }
 
