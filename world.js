@@ -168,7 +168,7 @@ function World() {
 					lights.push(new PointLight([i, j, Math.random((this.wallHeight-1) * 0.9) + 1]));
 				} else if (c == '#') {
 					// Corner points
-					var north, south, west, east;
+					var north = false, south = false, west = false, east = false;
 					var nw = [-halfGrid, -halfGrid], ne = [ halfGrid, -halfGrid];
 					var sw = [-halfGrid,  halfGrid], se = [ halfGrid,  halfGrid];
 					// Adjust corner according to neighbouring walls
