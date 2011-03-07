@@ -1,7 +1,7 @@
 
 function Actor(type, pos, texture) {
 	this.type = type;
-	this.pos = pos || vec3(0, 0, 0);
+	this.pos = pos || vec3.create(0.0, 0.0, 0.0);
 	this.texture = texture;
 
 	// Create sprite
@@ -32,12 +32,11 @@ function Actor(type, pos, texture) {
 
 	this.draw = function() {
 		mvPushMatrix();
+		this.pos[2] = 0.1;
 		mat4.translate(mvMatrix, this.pos);
-		gl.disable(gl.DEPTH_TEST);
 		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
 		useTexture(this.texture);
 		this.buffer.draw();
-		gl.enable(gl.DEPTH_TEST);
 		mvPopMatrix();
 	}
 }
