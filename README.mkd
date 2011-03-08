@@ -1,0 +1,6 @@
+7DRL
+====
+This game is made for the [7 Day Roguelike Challenge 2011](http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Contest_2011).
+
+The game is played inside a web browser and requires [WebGL](http://www.khronos.org/webgl/) support, so you need a rather new browser (e.g. Google Chrome 10 or Firefox 4 - IE won't work). Also, your graphics card needs to be new enough (with good drivers) for WebGL to work.
+

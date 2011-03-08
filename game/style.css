@@ -1,0 +1,67 @@
+@charset "utf-8";
+
+body {
+	background-color:#111;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+h1 {
+	color: #343;
+}
+
+p {
+	font-size: 16px;
+}
+
+.uitext {
+	font-size: 20px;
+	margin: 10px 10px 10px 10px;
+}
+
+.healthlabel {
+	color: #700;
+}
+
+#health {
+	color: #811;
+}
+
+.torchlabel {
+	color: #630;
+}
+
+#torch {
+	color: #741;
+}
+
+.torcheslabel {
+	color: #540;
+}
+
+#torches {
+	color: #651;
+}
+
+header {
+	height: 100px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+#game {
+	width: 600px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+footer {
+	height: 25px;
+	width: 600px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.copyright {
+	color: #111;
+}
