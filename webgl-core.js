@@ -314,3 +314,8 @@ function rand(lo, hi) {
 function roundvec(vec) {
 	return vec3.create([Math.round(vec[0]), Math.round(vec[1]), Math.round(vec[2])]);
 }
+
+function matchPos(p1, p2) {
+	return Math.round(p1[0]) == Math.round(p2[0])
+		&& Math.round(p1[1]) == Math.round(p2[1]);
+}

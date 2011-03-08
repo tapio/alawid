@@ -32,9 +32,29 @@ function Actor(type, pos, texture) {
 		this.move(target);
 	}
 
+
+
 	this.move = function(target) {
+		// Check wall collision
 		if (world.map.isWall(target))
 			return false;
+		// Check monster's collision to player
+		if (this.type != "player") {
+			// TODO: Attack
+			if (matchPos(player.pos, target)) return false;
+		}
+		// Collisions to monsters
+		for (var i = 0; i < monsters.length; ++i) {
+			if (this != monsters[i]) {
+				if (matchPos(monsters[i].pos, target)) {
+					if (this.type == "player") {
+						// TODO: Attack
+					}
+					return false;
+				}
+			}
+		}
+		// Move
 		this.target = vec3.create(target);
 		this.moving = true;
 		return true;
@@ -42,7 +62,7 @@ function Actor(type, pos, texture) {
 
 	this.updateMoving = function() {
 		vec3.lerp(this.pos, this.target, 0.2);
-		if (Math.abs(this.pos[0]-this.target[0]) + Math.abs(this.pos[1]-this.target[1]) < 0.1) {
+		if (Math.abs(this.pos[0]-this.target[0]) + Math.abs(this.pos[1]-this.target[1]) < 0.01) {
 			this.moving = false;
 			this.pos = roundvec(this.pos);
 		}
