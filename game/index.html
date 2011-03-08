@@ -115,6 +115,7 @@
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+		pMatrix[5] = -pMatrix[5]; // Flip y-axis
 
 		curProg = coreShaderProgram;
 		gl.useProgram(curProg);
@@ -124,7 +125,6 @@
 		gl.uniform1i(curProg.enableNormalMapUniform, 1);
 
 		mat4.identity(mvMatrix);
-		mvMatrix[5] = -1; // Flip y-axis
 
 		// Camera
 		// Height and position interpolation
