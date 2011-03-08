@@ -10,6 +10,39 @@ h1 {
 	color: #343;
 }
 
+p {
+	font-size: 16px;
+}
+
+.uitext {
+	font-size: 20px;
+	margin: 10px 10px 10px 10px;
+}
+
+.healthlabel {
+	color: #700;
+}
+
+#health {
+	color: #811;
+}
+
+.torchlabel {
+	color: #630;
+}
+
+#torch {
+	color: #741;
+}
+
+.torcheslabel {
+	color: #540;
+}
+
+#torches {
+	color: #651;
+}
+
 header {
 	height: 100px;
 	margin: 0 auto;

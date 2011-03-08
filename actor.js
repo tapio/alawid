@@ -32,8 +32,6 @@ function Actor(type, pos, texture) {
 		this.move(target);
 	}
 
-
-
 	this.move = function(target) {
 		// Check wall collision
 		if (world.map.isWall(target))
