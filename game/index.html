@@ -52,6 +52,12 @@
 
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
+
+		// Torch
+		if (pressedKeys[84]) {
+			if (player.leftHand == "torch") player.leftHand = null;
+			else if (player.torches > 0) player.leftHand = "torch";
+		}
 	}
 
 	function handleKeyUp(event) {
@@ -59,12 +65,14 @@
 	}
 
 	function handleKeys() {
+		// First person mode
 		cameraFirstPerson = false;
 		if (pressedKeys[76]) {
 			cameraFirstPerson = true;
 			if (pressedKeys[37] || pressedKeys[65]) cameraAngle += 0.05; // Left cursor key or A
 			else if (pressedKeys[39] || pressedKeys[68]) cameraAngle -= 0.05; // Right cursor key or D
 
+		// Movement
 		} else if (!player.moving) {
 			var dx = 0, dy = 0;
 
@@ -124,7 +132,9 @@
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], -cameraPos[2]]);
 
 		 // Lighting
-		lights[0].position = vec3.create([player.pos[0], player.pos[1], 0.5]);
+		lights[0].position = (player.leftHand == "torch")
+			? vec3.create([player.pos[0], player.pos[1], 0.5])
+			: vec3.create([-1000, -1000, -1000]); // HACK: Hide the torch
 		setLightUniforms();
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
@@ -150,12 +160,18 @@
 			for (var i = 0; i < lights.length; ++i) {
 				var anim = timeNow / (1000.0 + i);
 				anim = 0.5 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
-				lights[i].attenuation = vec3.create([0.0, 0.0, 0.8 + anim]);
+				lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
 			}
 		}
 		lastTime = timeNow;
+		updateUI();
 	}
 
+	function updateUI() {
+		document.getElementById("health").innerHTML = player.condition + "%";
+		document.getElementById("torch").innerHTML = player.torch + "%";
+		document.getElementById("torches").innerHTML = player.torches;
+	}
 
 	function tick() {
 		requestAnimFrame(tick);
@@ -208,7 +224,7 @@
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
 		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100%</span></span>
-		<span class="uitext"><span class="torcheslabel">Torches:</span> <span id="torches">1</span></span>
+		<span class="uitext"><span class="torcheslabel">Torches:</span> <span id="torches">-</span></span>
 		</p>
 	</section>
 	<footer>

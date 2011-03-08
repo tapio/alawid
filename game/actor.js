@@ -5,6 +5,12 @@ function Actor(type, pos, texture) {
 	this.texture = texture;
 	this.target = this.pos;
 	this.moving = false;
+	this.condition = 100.0;
+	if (type == "player") {
+		this.leftHand = "torch";
+		this.torch = 100.0;
+		this.torches = 3;
+	}
 
 	// Create sprite
 	var vertices = [
