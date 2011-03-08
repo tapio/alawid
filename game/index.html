@@ -59,7 +59,13 @@
 	}
 
 	function handleKeys() {
-		if (!player.moving) {
+		cameraFirstPerson = false;
+		if (pressedKeys[76]) {
+			cameraFirstPerson = true;
+			if (pressedKeys[37] || pressedKeys[65]) cameraAngle += 0.05; // Left cursor key or A
+			else if (pressedKeys[39] || pressedKeys[68]) cameraAngle -= 0.05; // Right cursor key or D
+
+		} else if (!player.moving) {
 			var dx = 0, dy = 0;
 
 			if (pressedKeys[37] || pressedKeys[65]) dx = -1; // Left cursor key or A
@@ -77,8 +83,13 @@
 
 	// Rendering
 
-	var cameraHeight = -6.0;
+	const cameraMaxHeight = 6.0;
+	const cameraMinHeight = 0.3;
+	var cameraHeight = cameraMaxHeight;
 	var cameraPos = vec3.create([0, 0, cameraHeight]);
+	var cameraAngle = 0.0;
+	var cameraPitch = 0.0;
+	var cameraFirstPerson = false;
 
 	function drawScene() {
 		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -97,16 +108,20 @@
 		mvMatrix[5] = -1; // Flip y-axis
 
 		// Camera
-		vec3.lerp(cameraPos, player.pos, 0.1);
-		/*var dx = cameraPos[0] - player.pos[0];
-		var dy = player.pos[1] - cameraPos[1];
-		var dist = Math.sqrt(dx*dx + dy*dy);
-		if (dist > 0.01) {
-			dist = Math.min(dist, 1.0);
-			mat4.rotate(mvMatrix, -degToRad(35.0 * dist), [dy, dx, 0]);
-		}*/
-		cameraPos[2] = cameraHeight; // Constant height
-		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
+		// Height and position interpolation
+		var targetHeight = cameraFirstPerson ? cameraMinHeight : cameraMaxHeight;
+		vec3.lerp(cameraPos, [player.pos[0], player.pos[1], targetHeight], 0.1);
+		// Pitch angle (first person view)
+		var targetPitch = cameraFirstPerson ? degToRad(90.0) : 0.0;
+		cameraPitch = cameraPitch + 0.1 * (targetPitch - cameraPitch);
+		if (Math.abs(cameraPitch) > 0.01)
+			mat4.rotate(mvMatrix, cameraPitch, [1, 0, 0]);
+		// Looking angle (first person view)
+		if (!cameraFirstPerson) cameraAngle = 0.0;
+		if (cameraAngle != 0.0)
+			mat4.rotate(mvMatrix, cameraAngle, [0, 0, 1]);
+		// Set position
+		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], -cameraPos[2]]);
 
 		 // Lighting
 		lights[0].position = vec3.create([player.pos[0], player.pos[1], 0.5]);
