@@ -53,6 +53,11 @@
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
 
+		if (pressedKeys[72]) {
+			var el = document.getElementById("help");
+			el.style.display = (el.style.display != 'none' ? 'none' : '' );
+		}
+
 		if (player.dead()) return;
 		// Torch
 		if (pressedKeys[84]) {
@@ -211,15 +216,20 @@
 
 </script>
 
-
 </head>
 
-
 <body onload="webGLStart();">
-
 	<header>
 		<h1>WebGL 7DRL</h1>
 	</header>
+	<section id="help">
+		<ul>
+		<li>Arrows/WASD to move and attack</li>
+		<li>T to toggle torch</li>
+		<li>L to enter first-person looking mode</li>
+		<li>H to toggle this help</li>
+		</ul>
+	</section>
 	<section id="game">
 		<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
 		<p>

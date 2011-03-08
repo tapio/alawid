@@ -15,11 +15,6 @@ p {
 	font-size: 16px;
 }
 
-#gameover h1 {
-	color: #f00;
-	font-size: 36px;
-}
-
 .uitext {
 	font-size: 20px;
 	margin: 10px 10px 10px 10px;
@@ -59,6 +54,19 @@ header {
 	width: 600px;
 	margin: 0 auto;
 	text-align: center;
+}
+
+#gameover h1 {
+	color: #f00;
+	font-size: 36px;
+}
+
+#help {
+	color: gray;
+	background-color: rgba(0, 0, 0, 0.5);
+	border-radius: 20px;
+	padding: 15px;
+	float: right;
 }
 
 footer {
