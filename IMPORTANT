@@ -1,0 +1,9 @@
+Important
+=========
+
+Do not edit index.html, instead:
+
+* README.mkd for the text body / actual content
+* template.html for styling / layout etc.
+
+Then generate the index.html by running ./build.sh - markdown and sed is required.
