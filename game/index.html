@@ -148,9 +148,8 @@
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], -cameraPos[2]]);
 
 		 // Lighting
-		lights[0].position = (player.leftHand == "torch")
-			? vec3.create([player.pos[0], player.pos[1], 0.5])
-			: vec3.create([-1000, -1000, -1000]); // HACK: Hide the torch
+		if (player.leftHand != "torch") lights[0].attenuation = vec3.create([1000, 1000, 1000]);
+		lights[0].position = vec3.create([player.pos[0], player.pos[1], 0.5])
 		setLightUniforms();
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
