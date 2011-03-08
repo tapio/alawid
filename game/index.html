@@ -56,7 +56,7 @@
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
 
-		if (pressedKeys[72]) {
+		if (event.keyCode == 72) {
 			var el = document.getElementById("help");
 			document.getElementById("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
@@ -64,10 +64,15 @@
 
 		if (player.dead()) return;
 		// Torch
-		if (pressedKeys[84]) {
+		if (event.keyCode == 84) {
 			if (player.leftHand == "torch") player.leftHand = null;
 			else if (player.torches > 0) player.leftHand = "torch";
 		}
+		// Zoom
+		if (event.keyCode == 107 || event.keyCode == 187)
+			cameraHeight = Math.max(cameraHeight - 0.5, cameraMinHeight);
+		if (event.keyCode == 109 || event.keyCode == 189)
+			cameraHeight = Math.min(cameraHeight + 0.5, cameraMaxHeight);
 	}
 
 	function handleKeyUp(event) {
@@ -102,9 +107,9 @@
 
 	// Rendering
 
-	const cameraMaxHeight = 6.0;
-	const cameraMinHeight = 0.3;
-	var cameraHeight = cameraMaxHeight;
+	const cameraMinHeight = 4.0;
+	const cameraMaxHeight = 8.0;
+	var cameraHeight = (cameraMinHeight + cameraMaxHeight) * 0.5;
 	var cameraPos = vec3.create([0, 0, cameraHeight]);
 	var cameraAngle = 0.0;
 	var cameraPitch = 0.0;
@@ -128,7 +133,7 @@
 
 		// Camera
 		// Height and position interpolation
-		var targetHeight = cameraFirstPerson ? cameraMinHeight : cameraMaxHeight;
+		var targetHeight = cameraFirstPerson ? 0.4 : cameraHeight;
 		vec3.lerp(cameraPos, [player.pos[0], player.pos[1], targetHeight], 0.1);
 		// Pitch angle (first person view)
 		var targetPitch = cameraFirstPerson ? degToRad(90.0) : 0.0;
@@ -258,6 +263,8 @@
 		<li>T to toggle torch</li>
 		<li>L to enter first-person looking mode</li>
 		<li>H to toggle this help</li>
+		<li>+ to zoom in</li>
+		<li>- to zoom out</li>
 		</ul>
 	</section>
 	<section id="game">

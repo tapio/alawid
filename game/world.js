@@ -181,7 +181,7 @@ function World() {
 	}
 
 	this.createWallBuffer = function(data) {
-		this.wallHeight = Math.abs(cameraHeight) + 1.0;
+		this.wallHeight = Math.abs(cameraMaxHeight) + 1.0;
 		this.vertices = []; this.texcoords = []; this.indices = [];
 		for (var j = 0; j < data.length; ++j) {
 			var row = data[j];
