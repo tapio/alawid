@@ -175,16 +175,25 @@
 
 	function updateUI() {
 		document.getElementById("health").innerHTML = player.condition + "%";
-		document.getElementById("torch").innerHTML = player.torch + "%";
+		document.getElementById("torch").innerHTML = player.torch + "s";
 		document.getElementById("torches").innerHTML = player.torches;
 	}
 
 	var frameCounter = 0;
 
-	function updateFPS() {
+	function doEachSecond() {
+		// Handle FPS
 		document.getElementById("fps").innerHTML = frameCounter;
 		frameCounter = 0;
-		setTimeout("updateFPS()", 1000);
+		// Handle player torch
+		if (player.leftHand == "torch") {
+			player.torch -= 1.0;
+			if (player.torch <= 0) {
+				player.leftHand = null;
+				--player.torches;
+				player.torch = player.torches > 0 ? torchMaxTime : 0;
+			}
+		}
 	}
 
 	function tick() {
@@ -220,7 +229,7 @@
 			monsters.push(new Actor(type, world.map.findEmpty(), type));
 		}
 
-		setTimeout("updateFPS()", 1000);
+		setInterval("doEachSecond()", 1000);
 		tick();
 	}
 
@@ -247,7 +256,7 @@
 		<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
-		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100%</span></span>
+		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100s</span></span>
 		<span class="uitext"><span class="torcheslabel">Torches:</span> <span id="torches">-</span></span>
 		</p>
 	</section>

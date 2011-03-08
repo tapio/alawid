@@ -13,6 +13,8 @@ function Weapon(name, damage) {
 	}
 }
 
+const torchMaxTime = 60;
+
 function Actor(type, pos, texture) {
 	this.type = type;
 	this.pos = pos || vec3.create(0.0, 0.0, 0.0);
@@ -23,7 +25,7 @@ function Actor(type, pos, texture) {
 	if (type == "player") {
 		this.rightHand = new Weapon("sword", [2, 1, 6]);
 		this.leftHand = "torch";
-		this.torch = 100.0;
+		this.torch = torchMaxTime;
 		this.torches = 3;
 	} else if (type == "rat") {
 		this.rightHand = new Weapon("teeth", [1, 1, 6]);
