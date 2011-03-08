@@ -34,6 +34,8 @@
 		textures["rat_normalmap"] = loadTexture("textures/rat_normalmap.png");
 		textures["goblin"] = loadTexture("textures/goblin.png");
 		textures["goblin_normalmap"] = loadTexture("textures/goblin_normalmap.png");
+		textures["torch"] = loadTexture("textures/torch.png");
+		textures["torch_normalmap"] = loadTexture("textures/torch_normalmap.png");
 		textures["floor"] = loadTexture("textures/floor.jpg");
 		textures["floor_normalmap"] = loadTexture("textures/floor_normalmap.jpg");
 		textures["wall"] = loadTexture("textures/wall.jpg");
@@ -45,6 +47,7 @@
 	var player;
 	var world;
 	var monsters = [];
+	var items = [];
 
 	// Key handling
 
@@ -148,6 +151,8 @@
 
 		world.draw();
 		player.draw();
+		for (var i = 0; i < items.length; ++i)
+			items[i].draw();
 		for (var i = 0; i < monsters.length; ++i)
 			monsters[i].draw();
 	}
@@ -228,6 +233,9 @@
 			var type = rand(0,1) ? "rat" : "goblin";
 			monsters.push(new Actor(type, world.map.findEmpty(), type));
 		}
+		var torches = rand(4,6);
+		for (var i = 0; i < torches; ++i)
+			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
 
 		setInterval("doEachSecond()", 1000);
 		tick();

@@ -86,6 +86,17 @@ function Actor(type, pos, texture) {
 				}
 			}
 		}
+		// Collision to items
+		if (this.type == "player") {
+			for (var i = 0; i < items.length; ++i) {
+				if (!items[i].dead() && matchPos(items[i].pos, target)) {
+					if (items[i].type == "torch") {
+						++this.torches;
+						items[i].condition = 0;
+					}
+				}
+			}
+		}
 		// Move
 		this.target = vec3.create(target);
 		this.moving = true;
