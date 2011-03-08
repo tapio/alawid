@@ -11,3 +11,22 @@ The game is located in the subdirectory called [game](game/).
 
 Note that running the game locally will not probably work. You need a webserver to answer the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely).
 
+
+Gameplay features
+-----------------
+
+1. Collect and use torches to light up your journey
+2. Fight multiple enemy types
+3. ?
+4. Profit
+
+Graphical/engine features
+-------------------------
+
+* Mesh generation based on ASCII map
+* Automatic normal and tangent calculations for arbitrary triangle mesh
+* Per-pixel lighting
+* Multiple light sources
+* Normalmapping
+* Does not depend on external engines/frameworks (i.e. custom built)
+
