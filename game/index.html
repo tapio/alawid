@@ -53,6 +53,7 @@
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
 
+		if (player.dead()) return;
 		// Torch
 		if (pressedKeys[84]) {
 			if (player.leftHand == "torch") player.leftHand = null;
@@ -65,6 +66,7 @@
 	}
 
 	function handleKeys() {
+		if (player.dead()) return;
 		// First person mode
 		cameraFirstPerson = false;
 		if (pressedKeys[76]) {
@@ -145,26 +147,25 @@
 	}
 
 
-	var lastTime = 0;
-
-	function animate() {
+	function handleLogic() {
 		var timeNow = new Date().getTime();
-		if (lastTime != 0) {
-			var elapsed = timeNow - lastTime;
 
-			player.updateMoving();
-			for (var i = 0; i < monsters.length; ++i)
-				monsters[i].updateMoving();
+		player.updateMoving();
 
-			// Animate lights
-			for (var i = 0; i < lights.length; ++i) {
-				var anim = timeNow / (1000.0 + i);
-				anim = 0.5 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
-				lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
-			}
+		for (var i = 0; i < monsters.length; ++i)
+			monsters[i].updateMoving();
+
+		if (player.dead()) {
+			document.getElementById("game").style.display = "none";
+			document.getElementById("gameover").style.display = "block";
 		}
-		lastTime = timeNow;
-		updateUI();
+
+		// Animate lights
+		for (var i = 0; i < lights.length; ++i) {
+			var anim = timeNow / (1000.0 + i);
+			anim = 0.5 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
+			lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
+		}
 	}
 
 	function updateUI() {
@@ -176,10 +177,10 @@
 	function tick() {
 		requestAnimFrame(tick);
 		handleKeys();
+		handleLogic();
 		drawScene();
-		animate();
+		updateUI();
 	}
-
 
 	function webGLStart() {
 		var canvas = document.getElementById("glcanvas");
@@ -226,6 +227,9 @@
 		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100%</span></span>
 		<span class="uitext"><span class="torcheslabel">Torches:</span> <span id="torches">-</span></span>
 		</p>
+	</section>
+	<section id="gameover" style="display: none;">
+		<h1>You died!</h1>
 	</section>
 	<footer>
 		<span class="copyright">&copy; Tapio Vierros 2011</span>

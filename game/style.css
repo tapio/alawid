@@ -8,10 +8,16 @@ body {
 
 h1 {
 	color: #343;
+	text-align: center;
 }
 
 p {
 	font-size: 16px;
+}
+
+#gameover h1 {
+	color: #f00;
+	font-size: 36px;
 }
 
 .uitext {
