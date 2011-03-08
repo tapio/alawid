@@ -30,6 +30,10 @@
 	function initTextures() {
 		textures["player"] = loadTexture("textures/char.png");
 		textures["player_normalmap"] = loadTexture("textures/char_normalmap.png");
+		textures["rat"] = loadTexture("textures/rat.png");
+		textures["rat_normalmap"] = loadTexture("textures/rat_normalmap.png");
+		textures["goblin"] = loadTexture("textures/goblin.png");
+		textures["goblin_normalmap"] = loadTexture("textures/goblin_normalmap.png");
 		textures["floor"] = loadTexture("textures/floor.jpg");
 		textures["floor_normalmap"] = loadTexture("textures/floor_normalmap.jpg");
 		textures["wall"] = loadTexture("textures/wall.jpg");
@@ -167,8 +171,9 @@
 		lights[0] = new PointLight();
 		world = new World();
 		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
-		for (var i = 0; i < 10; ++i) {
-			monsters.push(new Actor("monster", world.map.findEmpty(), "player"));
+		for (var i = 0; i < 20; ++i) {
+			var type = rand(0,1) ? "rat" : "goblin";
+			monsters.push(new Actor(type, world.map.findEmpty(), type));
 		}
 
 		tick();
