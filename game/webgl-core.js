@@ -262,7 +262,7 @@ function VertexBuffer(vertices, texcoords, indices) {
 var lights = [];
 const NO_SPECULAR = 1000.0; // Shininess value that will disable specular color
 const MAX_LIGHTS = 8;
-const AMBIENT_LIGHT = [0.05, 0.05, 0.05];
+const AMBIENT_LIGHT = [0.06, 0.06, 0.06];
 
 function PointLight(position, diffuse, attenuation, specular) {
 	this.position = position;

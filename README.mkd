@@ -3,9 +3,11 @@
 
 (This page is WIP)
 
-This game is made for the [7 Day Roguelike Challenge 2011](http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Contest_2011).
+Made for the [7 Day Roguelike Challenge 2011](http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Contest_2011).
 
-The game is played inside a web browser and requires [WebGL](http://www.khronos.org/webgl/) support, so you need a rather new browser (e.g. Google Chrome 10 or Firefox 4 - IE won't work). Also, your graphics card needs to be at least OpenGL 2 capable (with decent drivers) for WebGL to work.
+The game is played inside a web browser and requires [WebGL](http://www.khronos.org/webgl/) support, so you need a rather new browser (e.g. Google Chrome 9+ or Firefox 4 - IE won't work). Also, your graphics card needs to be at least OpenGL 2 capable (with decent drivers) for WebGL to work. You can check supported browsers and other notes in [Khorono's WebGL Wiki](http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation).
 
 The game is located in the subdirectory called [game](game/).
+
+Note that running the game locally will not probably work. You need a webserver to answer for the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely).
 

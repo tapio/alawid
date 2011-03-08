@@ -34,6 +34,8 @@
 		textures["rat_normalmap"] = loadTexture("textures/rat_normalmap.png");
 		textures["goblin"] = loadTexture("textures/goblin.png");
 		textures["goblin_normalmap"] = loadTexture("textures/goblin_normalmap.png");
+		textures["torch"] = loadTexture("textures/torch.png");
+		textures["torch_normalmap"] = loadTexture("textures/torch_normalmap.png");
 		textures["floor"] = loadTexture("textures/floor.jpg");
 		textures["floor_normalmap"] = loadTexture("textures/floor_normalmap.jpg");
 		textures["wall"] = loadTexture("textures/wall.jpg");
@@ -45,6 +47,7 @@
 	var player;
 	var world;
 	var monsters = [];
+	var items = [];
 
 	// Key handling
 
@@ -52,6 +55,24 @@
 
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
+
+		if (event.keyCode == 72) {
+			var el = document.getElementById("help");
+			document.getElementById("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
+			el.style.display = (el.style.display != 'none' ? 'none' : '');
+		}
+
+		if (player.dead()) return;
+		// Torch
+		if (event.keyCode == 84) {
+			if (player.leftHand == "torch") player.leftHand = null;
+			else if (player.torches > 0) player.leftHand = "torch";
+		}
+		// Zoom
+		if (event.keyCode == 107 || event.keyCode == 187)
+			cameraHeight = Math.max(cameraHeight - 0.5, cameraMinHeight);
+		if (event.keyCode == 109 || event.keyCode == 189)
+			cameraHeight = Math.min(cameraHeight + 0.5, cameraMaxHeight);
 	}
 
 	function handleKeyUp(event) {
@@ -59,7 +80,16 @@
 	}
 
 	function handleKeys() {
-		if (!player.moving) {
+		if (player.dead()) return;
+		// First person mode
+		cameraFirstPerson = false;
+		if (pressedKeys[76]) {
+			cameraFirstPerson = true;
+			if (pressedKeys[37] || pressedKeys[65]) cameraAngle += 0.05; // Left cursor key or A
+			else if (pressedKeys[39] || pressedKeys[68]) cameraAngle -= 0.05; // Right cursor key or D
+
+		// Movement
+		} else if (!player.moving) {
 			var dx = 0, dy = 0;
 
 			if (pressedKeys[37] || pressedKeys[65]) dx = -1; // Left cursor key or A
@@ -77,14 +107,20 @@
 
 	// Rendering
 
-	var cameraHeight = -6.0;
+	const cameraMinHeight = 4.0;
+	const cameraMaxHeight = 8.0;
+	var cameraHeight = (cameraMinHeight + cameraMaxHeight) * 0.5;
 	var cameraPos = vec3.create([0, 0, cameraHeight]);
+	var cameraAngle = 0.0;
+	var cameraPitch = 0.0;
+	var cameraFirstPerson = false;
 
 	function drawScene() {
 		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+		pMatrix[5] = -pMatrix[5]; // Flip y-axis
 
 		curProg = coreShaderProgram;
 		gl.useProgram(curProg);
@@ -94,61 +130,90 @@
 		gl.uniform1i(curProg.enableNormalMapUniform, 1);
 
 		mat4.identity(mvMatrix);
-		mvMatrix[5] = -1; // Flip y-axis
 
 		// Camera
-		vec3.lerp(cameraPos, player.pos, 0.1);
-		/*var dx = cameraPos[0] - player.pos[0];
-		var dy = player.pos[1] - cameraPos[1];
-		var dist = Math.sqrt(dx*dx + dy*dy);
-		if (dist > 0.01) {
-			dist = Math.min(dist, 1.0);
-			mat4.rotate(mvMatrix, -degToRad(35.0 * dist), [dy, dx, 0]);
-		}*/
-		cameraPos[2] = cameraHeight; // Constant height
-		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], cameraHeight]);
+		// Height and position interpolation
+		var targetHeight = cameraFirstPerson ? 0.4 : cameraHeight;
+		vec3.lerp(cameraPos, [player.pos[0], player.pos[1], targetHeight], 0.1);
+		// Pitch angle (first person view)
+		var targetPitch = cameraFirstPerson ? degToRad(90.0) : 0.0;
+		cameraPitch = cameraPitch + 0.1 * (targetPitch - cameraPitch);
+		if (Math.abs(cameraPitch) > 0.01)
+			mat4.rotate(mvMatrix, cameraPitch, [1, 0, 0]);
+		// Looking angle (first person view)
+		if (!cameraFirstPerson) cameraAngle = 0.0;
+		if (cameraAngle != 0.0)
+			mat4.rotate(mvMatrix, cameraAngle, [0, 0, 1]);
+		// Set position
+		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], -cameraPos[2]]);
 
 		 // Lighting
-		lights[0].position = vec3.create([player.pos[0], player.pos[1], 0.5]);
+		lights[0].position = (player.leftHand == "torch")
+			? vec3.create([player.pos[0], player.pos[1], 0.5])
+			: vec3.create([-1000, -1000, -1000]); // HACK: Hide the torch
 		setLightUniforms();
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
 		world.draw();
 		player.draw();
+		for (var i = 0; i < items.length; ++i)
+			items[i].draw();
 		for (var i = 0; i < monsters.length; ++i)
 			monsters[i].draw();
 	}
 
-
-	var lastTime = 0;
-
-	function animate() {
+	function handleLogic() {
 		var timeNow = new Date().getTime();
-		if (lastTime != 0) {
-			var elapsed = timeNow - lastTime;
 
-			player.updateMoving();
-			for (var i = 0; i < monsters.length; ++i)
-				monsters[i].updateMoving();
+		player.updateMoving();
 
-			// Animate lights
-			for (var i = 0; i < lights.length; ++i) {
-				var anim = timeNow / (1000.0 + i);
-				anim = 0.5 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
-				lights[i].attenuation = vec3.create([0.0, 0.0, 0.8 + anim]);
-			}
+		for (var i = 0; i < monsters.length; ++i)
+			monsters[i].updateMoving();
+
+		if (player.dead()) {
+			document.getElementById("game").style.display = "none";
+			document.getElementById("gameover").style.display = "block";
 		}
-		lastTime = timeNow;
+
+		// Animate lights
+		for (var i = 0; i < lights.length; ++i) {
+			var anim = timeNow / (1000.0 + i);
+			anim = 0.5 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
+			lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
+		}
 	}
 
+	function updateUI() {
+		document.getElementById("health").innerHTML = player.condition + "%";
+		document.getElementById("torch").innerHTML = player.torch + "s";
+		document.getElementById("torches").innerHTML = player.torches;
+	}
+
+	var frameCounter = 0;
+
+	function doEachSecond() {
+		// Handle FPS
+		document.getElementById("fps").innerHTML = frameCounter;
+		frameCounter = 0;
+		// Handle player torch
+		if (player.leftHand == "torch") {
+			player.torch -= 1.0;
+			if (player.torch <= 0) {
+				player.leftHand = null;
+				--player.torches;
+				player.torch = player.torches > 0 ? torchMaxTime : 0;
+			}
+		}
+	}
 
 	function tick() {
 		requestAnimFrame(tick);
 		handleKeys();
+		handleLogic();
 		drawScene();
-		animate();
+		updateUI();
+		++frameCounter;
 	}
-
 
 	function webGLStart() {
 		var canvas = document.getElementById("glcanvas");
@@ -173,28 +238,45 @@
 			var type = rand(0,1) ? "rat" : "goblin";
 			monsters.push(new Actor(type, world.map.findEmpty(), type));
 		}
+		var torches = rand(4,6);
+		for (var i = 0; i < torches; ++i)
+			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
 
+		setInterval("doEachSecond()", 1000);
 		tick();
 	}
 
 </script>
 
-
 </head>
 
-
 <body onload="webGLStart();">
-
 	<header>
 		<h1>WebGL 7DRL</h1>
 	</header>
+	<section id="fpscounter" class="infobox">
+		FPS: <span id="fps">0</span>
+	</section>
 	<section id="game">
 		<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
-		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100%</span></span>
-		<span class="uitext"><span class="torcheslabel">Torches:</span> <span id="torches">1</span></span>
+		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100s</span></span>
+		<span class="uitext"><span class="torcheslabel">Torches:</span> <span id="torches">-</span></span>
 		</p>
+	</section>
+	<section id="gameover" style="display: none;">
+		<h1>You died!</h1>
+	</section>
+	<section id="help" class="infobox">
+		<ul>
+		<li>Arrows/WASD to move and attack</li>
+		<li>T to toggle torch</li>
+		<li>L to enter first-person looking mode</li>
+		<li>H to toggle this help</li>
+		<li>+ to zoom in</li>
+		<li>- to zoom out</li>
+		</ul>
 	</section>
 	<footer>
 		<span class="copyright">&copy; Tapio Vierros 2011</span>

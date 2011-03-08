@@ -8,6 +8,7 @@ body {
 
 h1 {
 	color: #343;
+	text-align: center;
 }
 
 p {
@@ -49,10 +50,34 @@ header {
 	text-align: center;
 }
 
+#fpscounter {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+}
+
+#help {
+	position: absolute;
+	top: 100px;
+	right: 10px;
+}
+
+.infobox {
+	color: gray;
+	background-color: rgba(0, 0, 0, 0.35);
+	border-radius: 20px;
+	padding: 15px;
+}
+
 #game {
 	width: 600px;
 	margin: 0 auto;
 	text-align: center;
+}
+
+#gameover h1 {
+	color: #f00;
+	font-size: 36px;
 }
 
 footer {
