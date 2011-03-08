@@ -55,7 +55,8 @@
 
 		if (pressedKeys[72]) {
 			var el = document.getElementById("help");
-			el.style.display = (el.style.display != 'none' ? 'none' : '' );
+			document.getElementById("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
+			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
 
 		if (player.dead()) return;
@@ -151,7 +152,6 @@
 			monsters[i].draw();
 	}
 
-
 	function handleLogic() {
 		var timeNow = new Date().getTime();
 
@@ -179,12 +179,21 @@
 		document.getElementById("torches").innerHTML = player.torches;
 	}
 
+	var frameCounter = 0;
+
+	function updateFPS() {
+		document.getElementById("fps").innerHTML = frameCounter;
+		frameCounter = 0;
+		setTimeout("updateFPS()", 1000);
+	}
+
 	function tick() {
 		requestAnimFrame(tick);
 		handleKeys();
 		handleLogic();
 		drawScene();
 		updateUI();
+		++frameCounter;
 	}
 
 	function webGLStart() {
@@ -211,6 +220,7 @@
 			monsters.push(new Actor(type, world.map.findEmpty(), type));
 		}
 
+		setTimeout("updateFPS()", 1000);
 		tick();
 	}
 
@@ -222,7 +232,10 @@
 	<header>
 		<h1>WebGL 7DRL</h1>
 	</header>
-	<section id="help">
+	<section id="fpscounter" class="infobox">
+		FPS: <span id="fps">0</span>
+	</section>
+	<section id="help" class="infobox">
 		<ul>
 		<li>Arrows/WASD to move and attack</li>
 		<li>T to toggle torch</li>

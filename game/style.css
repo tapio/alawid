@@ -50,6 +50,21 @@ header {
 	text-align: center;
 }
 
+#fpscounter {
+	float: left;
+}
+
+#help {
+	float: right;
+}
+
+.infobox {
+	color: gray;
+	background-color: rgba(0, 0, 0, 0.5);
+	border-radius: 20px;
+	padding: 15px;
+}
+
 #game {
 	width: 600px;
 	margin: 0 auto;
@@ -59,14 +74,6 @@ header {
 #gameover h1 {
 	color: #f00;
 	font-size: 36px;
-}
-
-#help {
-	color: gray;
-	background-color: rgba(0, 0, 0, 0.5);
-	border-radius: 20px;
-	padding: 15px;
-	float: right;
 }
 
 footer {
