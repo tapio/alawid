@@ -67,9 +67,7 @@
 			if (pressedKeys[38] || pressedKeys[87]) dy = -1; // Up cursor key or W
 			else if (pressedKeys[40] || pressedKeys[83]) dy = 1; // Down cursor key
 
-			if (!world.map.isWall([player.pos[0]+dx, player.pos[1]+dy])) {
-				player.move([player.pos[0]+dx, player.pos[1]+dy]);
-			}
+			player.move([player.pos[0]+dx, player.pos[1]+dy]);
 
 			// Monster AI
 			for (var i = 0; i < monsters.length; ++i)

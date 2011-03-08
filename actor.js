@@ -29,12 +29,15 @@ function Actor(type, pos, texture) {
 		var dx = rand(-1, 1);
 		var dy = rand(-1, 1);
 		var target = vec3.create([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
-		if (!world.map.isWall(target)) this.move(target);
+		this.move(target);
 	}
 
 	this.move = function(target) {
+		if (world.map.isWall(target))
+			return false;
 		this.target = vec3.create(target);
 		this.moving = true;
+		return true;
 	}
 
 	this.updateMoving = function() {
