@@ -53,10 +53,17 @@
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
 
+		// Infoboxes
 		if (event.keyCode == 72) {
 			var el = $("help");
 			$("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
 			$("glinfo").style.display = (el.style.display != 'none' ? 'none' : '');
+			el.style.display = (el.style.display != 'none' ? 'none' : '');
+		}
+		// Map
+		if (event.keyCode == 77) {
+			var el = $("mapoverlay");
+			el.innerHTML = "<pre>"+world.map.toString()+"</pre>";
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
 
@@ -275,6 +282,7 @@
 	</section>
 	<section id="game">
 		<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
+		<div id="mapoverlay" class="infobox" style="display: none;"></div>
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
 		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100s</span></span>
@@ -290,6 +298,7 @@
 		<li>Arrows/WASD to move and attack</li>
 		<li>T to toggle torch</li>
 		<li>L to enter first-person looking mode</li>
+		<li>M to toggle map overlay</li>
 		<li>H to toggle this help</li>
 		<li>+ to zoom in</li>
 		<li>- to zoom out</li>
