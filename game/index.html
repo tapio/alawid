@@ -232,16 +232,6 @@
 				player.torch = player.torches > 0 ? torchMaxTime : 0;
 			}
 		}
-
-		// HACK: These cannot be set on webGLStart() :(
-		$("glversion").innerHTML = gl.getParameter(gl.VERSION);
-		$("glslversion").innerHTML = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
-		$("glvendor").innerHTML = gl.getParameter(gl.VENDOR);
-		$("glrenderer").innerHTML = gl.getParameter(gl.RENDERER);
-		$("glvaryings").innerHTML = gl.getParameter(gl.MAX_VARYING_VECTORS);
-		$("glattribs").innerHTML = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
-		$("glvertuniforms").innerHTML = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
-		$("glfraguniforms").innerHTML = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
 	}
 
 	function tick() {
@@ -256,7 +246,14 @@
 	function webGLStart() {
 		var canvas = $("glcanvas");
 		initGL(canvas);
-
+		$("glversion").innerHTML = gl.getParameter(gl.VERSION);
+		$("glslversion").innerHTML = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
+		$("glvendor").innerHTML = gl.getParameter(gl.VENDOR);
+		$("glrenderer").innerHTML = gl.getParameter(gl.RENDERER);
+		$("glvaryings").innerHTML = gl.getParameter(gl.MAX_VARYING_VECTORS);
+		$("glattribs").innerHTML = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+		$("glvertuniforms").innerHTML = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
+		$("glfraguniforms").innerHTML = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
 		console.log("WebGL max varying vectors: " + gl.getParameter(gl.MAX_VARYING_VECTORS));
 		console.log("WebGL max fragment uniform vectors: " + gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS));
 
