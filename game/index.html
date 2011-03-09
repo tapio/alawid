@@ -20,7 +20,9 @@
 	var coreShaderProgram;
 
 	function initShaders() {
-		coreShaderProgram = createProgram("core.vert", "core.frag");
+		// We need to determine how many lights the shaders can handle
+		maxLights = Math.min(gl.getParameter(gl.MAX_VARYING_VECTORS)-3, maxLights);
+		coreShaderProgram = createProgram("core.vert", "core.frag", "#define MAX_LIGHTS "+maxLights);
 	}
 
 	// Textures
@@ -28,18 +30,13 @@
 	var textures = {};
 
 	function initTextures() {
-		textures["player"] = loadTexture("textures/char.png");
-		textures["player_normalmap"] = loadTexture("textures/char_normalmap.png");
-		textures["rat"] = loadTexture("textures/rat.png");
-		textures["rat_normalmap"] = loadTexture("textures/rat_normalmap.png");
-		textures["goblin"] = loadTexture("textures/goblin.png");
-		textures["goblin_normalmap"] = loadTexture("textures/goblin_normalmap.png");
-		textures["torch"] = loadTexture("textures/torch.png");
-		textures["torch_normalmap"] = loadTexture("textures/torch_normalmap.png");
-		textures["floor"] = loadTexture("textures/floor.jpg");
-		textures["floor_normalmap"] = loadTexture("textures/floor_normalmap.jpg");
-		textures["wall"] = loadTexture("textures/wall.jpg");
-		textures["wall_normalmap"] = loadTexture("textures/wall_normalmap.jpg");
+		var tex = ["player.png", "rat.png", "goblin.png", "torch.png", "floor.jpg", "wall.jpg"];
+		for (var i = 0; i < tex.length; ++i) {
+			var key = tex[i].substr(0, tex[i].lastIndexOf('.'));
+			var ext = tex[i].substr(tex[i].lastIndexOf('.'));
+			textures[key] = loadTexture("textures/"+key+ext);
+			textures[key+"_normalmap"] = loadTexture("textures/"+key+"_normalmap"+ext);
+		}
 	}
 
 	// Objects etc.
@@ -56,13 +53,43 @@
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
 
+		// Help
 		if (event.keyCode == 72) {
-			var el = document.getElementById("help");
-			document.getElementById("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
+			$("help").style.display = ($("help").style.display != 'none' ? 'none' : '');
+		}
+		// WebGL info
+		if (event.keyCode == 71) {
+			$("fpscounter").style.display = ($("glinfo").style.display != 'none' ? 'none' : '');
+			$("glinfo").style.display = ($("glinfo").style.display != 'none' ? 'none' : '');
+		}
+		// Map
+		if (event.keyCode == 77) {
+			var el = $("mapoverlay");
+			el.innerHTML = "<pre>"+world.map.toString()+"</pre>";
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
-
+		// Rest available only when player is alive
 		if (player.dead()) return;
+
+		// Movement
+		if (!player.moving) {
+			var dx = 0, dy = 0;
+
+			if (event.keyCode == 37 || event.keyCode == 65) dx = -1; // Left cursor key or A
+			else if (event.keyCode == 39 || event.keyCode == 68) dx = 1; // Right cursor key or D
+			if (event.keyCode == 38 || event.keyCode == 87) dy = -1; // Up cursor key or W
+			else if (event.keyCode == 40 || event.keyCode == 83) dy = 1; // Down cursor key
+
+			if ((dx || dy) && player.move([player.pos[0]+dx, player.pos[1]+dy])) {
+				// Monster AI
+				for (var i = 0; i < monsters.length; ++i)
+					monsters[i].ai();
+			} else if (dx || dy) {
+				addMessage("Cannot move there.");
+			}
+		}
+		// First person mode
+		if (event.keyCode == 76) cameraFirstPerson = !cameraFirstPerson;
 		// Torch
 		if (event.keyCode == 84) {
 			if (player.leftHand == "torch") player.leftHand = null;
@@ -81,27 +108,10 @@
 
 	function handleKeys() {
 		if (player.dead()) return;
-		// First person mode
-		cameraFirstPerson = false;
-		if (pressedKeys[76]) {
-			cameraFirstPerson = true;
+		// First person mode looking
+		if (cameraFirstPerson) {
 			if (pressedKeys[37] || pressedKeys[65]) cameraAngle += 0.05; // Left cursor key or A
 			else if (pressedKeys[39] || pressedKeys[68]) cameraAngle -= 0.05; // Right cursor key or D
-
-		// Movement
-		} else if (!player.moving) {
-			var dx = 0, dy = 0;
-
-			if (pressedKeys[37] || pressedKeys[65]) dx = -1; // Left cursor key or A
-			else if (pressedKeys[39] || pressedKeys[68]) dx = 1; // Right cursor key or D
-			if (pressedKeys[38] || pressedKeys[87]) dy = -1; // Up cursor key or W
-			else if (pressedKeys[40] || pressedKeys[83]) dy = 1; // Down cursor key
-
-			player.move([player.pos[0]+dx, player.pos[1]+dy]);
-
-			// Monster AI
-			for (var i = 0; i < monsters.length; ++i)
-				monsters[i].ai();
 		}
 	}
 
@@ -161,17 +171,25 @@
 			monsters[i].draw();
 	}
 
+	var messages = [];
+	var maxMessages = 10;
+
 	function handleLogic() {
 		var timeNow = new Date().getTime();
 
 		player.updateMoving();
 
-		for (var i = 0; i < monsters.length; ++i)
+		for (var i = monsters.length-1; i >= 0; --i) {
 			monsters[i].updateMoving();
+			if (monsters[i].dead()) monsters.splice(i, 1); // Remove dead monsters
+		}
+		for (var i = items.length-1; i >= 0; --i) {
+			if (items[i].dead()) items.splice(i, 1); // Remove dead items
+		}
 
 		if (player.dead()) {
-			document.getElementById("game").style.display = "none";
-			document.getElementById("gameover").style.display = "block";
+			$("game").style.display = "none";
+			$("gameover").style.display = "block";
 		}
 
 		// Animate lights
@@ -183,16 +201,29 @@
 	}
 
 	function updateUI() {
-		document.getElementById("health").innerHTML = player.condition + "%";
-		document.getElementById("torch").innerHTML = player.torch + "s";
-		document.getElementById("torches").innerHTML = player.torches;
+		$("health").innerHTML = player.condition + "%";
+		$("torch").innerHTML = player.torch + "s";
+		$("torches").innerHTML = player.torches;
+	}
+
+	function addMessage(msg) {
+		messages.push(msg);
+		if (messages.length > maxMessages) messages.splice(0, messages.length - maxMessages);
+		var msgs = "";
+		var colors = "23456789ad";
+		fade = colors.length-1;
+		for (var i = messages.length-1; i >= 0; --i, --fade) {
+			msgs += '<span style="color: #'+colors.charAt(fade)+'00000;">'+messages[i]+'</span><br/>';
+			if (i == messages.length-1) msgs = "<strong>"+msgs+"</strong>";
+		}
+		$("messages").innerHTML = msgs;
 	}
 
 	var frameCounter = 0;
 
 	function doEachSecond() {
 		// Handle FPS
-		document.getElementById("fps").innerHTML = frameCounter;
+		$("fps").innerHTML = frameCounter;
 		frameCounter = 0;
 		// Handle player torch
 		if (player.leftHand == "torch") {
@@ -215,8 +246,19 @@
 	}
 
 	function webGLStart() {
-		var canvas = document.getElementById("glcanvas");
+		var canvas = $("glcanvas");
 		initGL(canvas);
+		$("glversion").innerHTML = gl.getParameter(gl.VERSION);
+		$("glslversion").innerHTML = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
+		$("glvendor").innerHTML = gl.getParameter(gl.VENDOR);
+		$("glrenderer").innerHTML = gl.getParameter(gl.RENDERER);
+		$("glvaryings").innerHTML = gl.getParameter(gl.MAX_VARYING_VECTORS);
+		$("glattribs").innerHTML = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+		$("glvertuniforms").innerHTML = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
+		$("glfraguniforms").innerHTML = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+		console.log("WebGL max varying vectors: " + gl.getParameter(gl.MAX_VARYING_VECTORS));
+		console.log("WebGL max fragment uniform vectors: " + gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS));
+
 		initShaders();
 		initTextures();
 
@@ -242,6 +284,7 @@
 			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
 
 		setInterval("doEachSecond()", 1000);
+		addMessage("Welcome.");
 		tick();
 	}
 
@@ -253,11 +296,12 @@
 	<header>
 		<h1>WebGL 7DRL</h1>
 	</header>
-	<section id="fpscounter" class="infobox">
+	<section id="fpscounter" class="infobox" style="display: none;">
 		FPS: <span id="fps">0</span>
 	</section>
 	<section id="game">
 		<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
+		<div id="mapoverlay" class="infobox" style="display: none;"></div>
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
 		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100s</span></span>
@@ -267,14 +311,34 @@
 	<section id="gameover" style="display: none;">
 		<h1>You died!</h1>
 	</section>
+	<section id="messagesbox" class="infobox">
+		<h3>Messages</h3>
+		<div id="messages"></div>
+	</section>
 	<section id="help" class="infobox">
+		<h3>Keys</h3>
 		<ul>
 		<li>Arrows/WASD to move and attack</li>
 		<li>T to toggle torch</li>
 		<li>L to enter first-person looking mode</li>
-		<li>H to toggle this help</li>
 		<li>+ to zoom in</li>
 		<li>- to zoom out</li>
+		<li>M to toggle map overlay</li>
+		<li>H to toggle this help</li>
+		<li>G to toggle WebGL info</li>
+		</ul>
+	</section>
+	<section id="glinfo" class="infobox" style="display: none;">
+		<h3>WebGL info</h3>
+		<ul>
+		<li>Version: <span id="glversion">n/a</span></li>
+		<li>Shading language: <span id="glslversion">n/a</span></li>
+		<li>Vendor: <span id="glvendor">n/a</span></li>
+		<li>Renderer: <span id="glrenderer">n/a</span></li>
+		<li>Max varying vectors: <span id="glvaryings">n/a</span></li>
+		<li>Max vertex attribs: <span id="glattribs">n/a</span></li>
+		<li>Max vertex uniform vectors: <span id="glvertuniforms">n/a</span></li>
+		<li>Max fragment uniform vectors: <span id="glfraguniforms">n/a</span></li>
 		</ul>
 	</section>
 	<footer>

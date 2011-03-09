@@ -8,7 +8,7 @@ function initGL(canvas) {
 		gl.viewportWidth = canvas.width;
 		gl.viewportHeight = canvas.height;
 	} catch (e) { }
-	if (!gl) alert("Could not initialise WebGL, sorry :-(");
+	if (!gl) alert("Could not initialise WebGL :-(\nPerhaps your browser is too old or incompatible. You might also have poor graphics card.");
 }
 
 
@@ -40,9 +40,10 @@ function createShader(gl, source, type) {
 	return shader;
 }
 
-function createProgram(vertexShaderFile, fragmentShaderFile) {
-	var vertexShader = createShader(gl, loadFile('shaders/'+vertexShaderFile), gl.VERTEX_SHADER);
-	var fragmentShader = createShader(gl, loadFile('shaders/'+fragmentShaderFile), gl.FRAGMENT_SHADER);
+function createProgram(vertexShaderFile, fragmentShaderFile, defines) {
+	if (!defines) defines = "";
+	var vertexShader = createShader(gl, defines+"\n"+loadFile('shaders/'+vertexShaderFile), gl.VERTEX_SHADER);
+	var fragmentShader = createShader(gl, defines+"\n"+loadFile('shaders/'+fragmentShaderFile), gl.FRAGMENT_SHADER);
 	var program = gl.createProgram();
 	gl.attachShader(program, vertexShader);
 	gl.attachShader(program, fragmentShader);
@@ -63,15 +64,13 @@ function createProgram(vertexShaderFile, fragmentShaderFile) {
 	program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
 	program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
 	program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix");
-	program.enableNormalMapUniform = gl.getUniformLocation(program, "uEnableNormalMap");
 	program.textureSamplerUniform = gl.getUniformLocation(program, "uTextureSampler");
 	program.normalMapSamplerUniform = gl.getUniformLocation(program, "uNormalMapSampler");
 	program.materialShininessUniform = gl.getUniformLocation(program, "uMaterialShininess");
 	program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
+	program.diffuseColorUniform = gl.getUniformLocation(program, "uDiffuseColor");
 	program.lightCountUniform = gl.getUniformLocation(program, "uLightCount");
 	program.lightPositionUniform = gl.getUniformLocation(program, "uLightPositions");
-	program.lightDiffuseUniform = gl.getUniformLocation(program, "uLightDiffuseColors");
-	program.lightSpecularUniform = gl.getUniformLocation(program, "uLightSpecularColors");
 	program.lightAttenuationUniform = gl.getUniformLocation(program, "uLightAttenuations");
 	return program;
 }
@@ -260,8 +259,8 @@ function VertexBuffer(vertices, texcoords, indices) {
 // Lighting
 
 var lights = [];
+var maxLights = 8;
 const NO_SPECULAR = 1000.0; // Shininess value that will disable specular color
-const MAX_LIGHTS = 8;
 const AMBIENT_LIGHT = [0.06, 0.06, 0.06];
 
 function PointLight(position, diffuse, attenuation, specular) {
@@ -269,35 +268,32 @@ function PointLight(position, diffuse, attenuation, specular) {
 	this.diffuse = diffuse || vec3.create([0.9, 0.6, 0.1]);
 	this.attenuation = attenuation || vec3.create([0.0, 0.0, 2.0]);
 	this.specular = specular || vec3.create([1.0, 0.7, 0.2]);
+	// NOTE: specular color is hard-coded to shaders and diffuse is global
+	// due to nasty limits in varyings/uniforms
 }
 
 function setLightUniforms() {
-	var lightCount = Math.min(lights.length, MAX_LIGHTS);
+	var lightCount = Math.min(lights.length, maxLights);
 	gl.uniform1i(curProg.lightCountUniform, lightCount);
 
 	function sortLights(a, b) {
-		var da = Math.abs(player.pos[0] - a.position[0]) + Math.abs(player.pos[1] - a.position[1]);
-		var db = Math.abs(player.pos[0] - b.position[0]) + Math.abs(player.pos[1] - b.position[1]);
-		return da - db;
+		return player.distance(a.position) - player.distance(b.position);
 	}
 
 	if (lightCount < lights.length) lights.sort(sortLights);
 
-	var position = [], diffuse = [], specular = [], attenuation = [];
+	var position = [], attenuation = [];
 	for (var i = 0; i < lightCount; ++i) {
 		var lightPos = vec3.create(lights[i].position);
 		mat4.multiplyVec3(mvMatrix, lightPos);
 		function concat(a, b) { return a.concat([b[0], b[1], b[2]]); }
 		position = concat(position, lightPos);
-		diffuse = concat(diffuse, lights[i].diffuse);
-		specular = concat(specular, lights[i].specular);
 		attenuation = concat(attenuation, lights[i].attenuation);
 	}
 	gl.uniform3fv(curProg.lightPositionUniform, position);
-	gl.uniform3fv(curProg.lightDiffuseUniform, diffuse);
-	gl.uniform3fv(curProg.lightSpecularUniform, specular);
 	gl.uniform3fv(curProg.lightAttenuationUniform, attenuation);
-	gl.uniform3f(curProg.ambientColorUniform, AMBIENT_LIGHT[0], AMBIENT_LIGHT[1], AMBIENT_LIGHT[2]);
+	gl.uniform3fv(curProg.diffuseColorUniform, lights[0].diffuse);
+	gl.uniform3fv(curProg.ambientColorUniform, AMBIENT_LIGHT);
 }
 
 
@@ -311,6 +307,8 @@ function rand(lo, hi) {
 	return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
 
+function sign(num) { return ((num > 0) ? 1 : ((num < 0) ? -1 : 0)); }
+
 function roundvec(vec) {
 	return vec3.create([Math.round(vec[0]), Math.round(vec[1]), Math.round(vec[2])]);
 }
@@ -318,4 +316,17 @@ function roundvec(vec) {
 function matchPos(p1, p2) {
 	return Math.round(p1[0]) == Math.round(p2[0])
 		&& Math.round(p1[1]) == Math.round(p2[1]);
+}
+
+function $() {
+	var elements = new Array();
+	for (var i = 0; i < arguments.length; ++i) {
+		var element = arguments[i];
+		if (typeof element == 'string')
+			element = document.getElementById(element);
+		if (arguments.length == 1)
+			return element;
+		elements.push(element);
+	}
+	return elements;
 }

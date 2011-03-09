@@ -1,4 +1,20 @@
 
+const SQUARE_VERTICES = [
+	-0.5,-0.5, 0.0,
+	+0.5,-0.5, 0.0,
+	+0.5,+0.5, 0.0,
+	-0.5,+0.5, 0.0
+	];
+const SQUARE_TEXCOORDS = [
+	0.0, 1.0,
+	1.0, 1.0,
+	1.0, 0.0,
+	0.0, 0.0,
+	];
+const SQUARE_INDICES = [
+	0, 1, 2,    0, 2, 3
+	];
+
 function Weapon(name, damage) {
 	this.name = name;
 	this.dmgCnt = damage[0];
@@ -33,32 +49,38 @@ function Actor(type, pos, texture) {
 		this.rightHand = new Weapon("sword", [2, 1, 6]);
 	}
 
-	// Create sprite
-	var vertices = [
-		-0.5,-0.5, 0.0,
-		+0.5,-0.5, 0.0,
-		+0.5,+0.5, 0.0,
-		-0.5,+0.5, 0.0
-		];
-	var texcoords = [
-		0.0, 1.0,
-		1.0, 1.0,
-		1.0, 0.0,
-		0.0, 0.0,
-		];
-	var indices = [
-		0, 1, 2,    0, 2, 3
-		];
-	this.buffer = new VertexBuffer(vertices, texcoords, indices);
+	this.buffer = new VertexBuffer(SQUARE_VERTICES, SQUARE_TEXCOORDS, SQUARE_INDICES);
 
 	this.dead = function() { return this.condition <= 0; }
 
+	this.distance = function(targetpos) {
+		var dx = targetpos[0] - this.pos[0];
+		var dy = targetpos[1] - this.pos[1];
+		return Math.sqrt(dx*dx+dy*dy);
+	}
+
 	this.ai = function() {
 		if (this.dead() || this.moving) return;
-		var dx = rand(-1, 1);
-		var dy = rand(-1, 1);
-		var target = vec3.create([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
-		this.move(target);
+		var dx = 0, dy = 0;
+		if (this.distance(player.pos) < 3) {
+			// Attack player
+			dx = sign(Math.round(player.pos[0]) - Math.round(this.pos[0]));
+			dy = sign(Math.round(player.pos[1]) - Math.round(this.pos[1]));
+		} else {
+			// Wander aimlessly
+			dx = rand(-1, 1);
+			dy = rand(-1, 1);
+		}
+		this.move([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
+	}
+
+	this.attack = function(opponent) {
+		var dmg = this.rightHand.damage();
+		opponent.condition -= dmg;
+		if (this.type == "player")
+			addMessage("You hit "+opponent.type+" by "+dmg+"!");
+		else if (opponent.type == "player")
+			addMessage("Enemy "+this.type+" hits you by "+dmg+"!");
 	}
 
 	this.move = function(target) {
@@ -70,7 +92,7 @@ function Actor(type, pos, texture) {
 		if (this.type != "player") {
 			// Attack
 			if (matchPos(player.pos, target)) {
-				player.condition -= this.rightHand.damage();
+				this.attack(player);
 				return true;
 			}
 		}
@@ -78,10 +100,8 @@ function Actor(type, pos, texture) {
 		for (var i = 0; i < monsters.length; ++i) {
 			if (this != monsters[i] && !monsters[i].dead()) {
 				if (matchPos(monsters[i].pos, target)) {
-					if (this.type == "player") {
-						// Attack
-						monsters[i].condition -= this.rightHand.damage();
-					}
+					if (this.type == "player") // Attack
+						this.attack(monsters[i])
 					return true;
 				}
 			}
@@ -93,6 +113,7 @@ function Actor(type, pos, texture) {
 					if (items[i].type == "torch") {
 						++this.torches;
 						items[i].condition = 0;
+						addMessage("You picked up "+items[i].type+".");
 					}
 				}
 			}
@@ -117,7 +138,7 @@ function Actor(type, pos, texture) {
 		mvPushMatrix();
 		this.pos[2] = 0.1;
 		mat4.translate(mvMatrix, this.pos);
-		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
+		gl.uniform1f(curProg.materialShininessUniform, 8.0);
 		useTexture(this.texture);
 		this.buffer.draw();
 		mvPopMatrix();
