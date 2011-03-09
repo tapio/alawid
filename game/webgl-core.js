@@ -8,7 +8,7 @@ function initGL(canvas) {
 		gl.viewportWidth = canvas.width;
 		gl.viewportHeight = canvas.height;
 	} catch (e) { }
-	if (!gl) alert("Could not initialise WebGL, sorry :-(");
+	if (!gl) alert("Could not initialise WebGL :-(\nPerhaps your browser is too old or incompatible. You might also have poor graphics card.");
 }
 
 

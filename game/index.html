@@ -169,8 +169,13 @@
 
 		player.updateMoving();
 
-		for (var i = 0; i < monsters.length; ++i)
+		for (var i = monsters.length-1; i >= 0; --i) {
 			monsters[i].updateMoving();
+			if (monsters[i].dead()) monsters.splice(i, 1); // Remove dead monsters
+		}
+		for (var i = items.length-1; i >= 0; --i) {
+			if (items[i].dead()) items.splice(i, 1); // Remove dead items
+		}
 
 		if (player.dead()) {
 			document.getElementById("game").style.display = "none";
