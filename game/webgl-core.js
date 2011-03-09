@@ -277,9 +277,7 @@ function setLightUniforms() {
 	gl.uniform1i(curProg.lightCountUniform, lightCount);
 
 	function sortLights(a, b) {
-		var da = Math.abs(player.pos[0] - a.position[0]) + Math.abs(player.pos[1] - a.position[1]);
-		var db = Math.abs(player.pos[0] - b.position[0]) + Math.abs(player.pos[1] - b.position[1]);
-		return da - db;
+		return player.distance(a.position) - player.distance(b.position);
 	}
 
 	if (lightCount < lights.length) lights.sort(sortLights);

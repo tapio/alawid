@@ -53,6 +53,12 @@ function Actor(type, pos, texture) {
 
 	this.dead = function() { return this.condition <= 0; }
 
+	this.distance = function(targetpos) {
+		var dx = targetpos[0] - this.pos[0];
+		var dy = targetpos[1] - this.pos[1];
+		return Math.sqrt(dx*dx+dy*dy);
+	}
+
 	this.ai = function() {
 		if (this.dead() || this.moving) return;
 		var dx = rand(-1, 1);
