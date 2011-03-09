@@ -123,7 +123,7 @@ function DungeonMap(w, h) {
 	}
 
 	this.generate(w, h);
-	console.log(this.toString());
+	//console.log(this.toString());
 
 }
 

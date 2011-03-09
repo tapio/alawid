@@ -2,19 +2,18 @@
 precision highp float;
 #endif
 
-#define MAX_LIGHTS 8
+// MAX_LIGHTS is defined by calling code
+// Limit varying vectors to 8 and uniform vectors to 16
 
 uniform float uMaterialShininess;
 
 uniform vec3 uAmbientColor;
+uniform vec3 uDiffuseColor;
 
 uniform int uLightCount;
 uniform vec3 uLightPositions[MAX_LIGHTS];
-uniform vec3 uLightDiffuseColors[MAX_LIGHTS];
-uniform vec3 uLightSpecularColors[MAX_LIGHTS];
 uniform vec3 uLightAttenuations[MAX_LIGHTS];
 
-uniform bool uEnableNormalMap;
 uniform sampler2D uTextureSampler;
 uniform sampler2D uNormalMapSampler;
 
@@ -25,13 +24,11 @@ varying vec3 vLightVectors[MAX_LIGHTS];
 
 
 void main(void) {
+	vec3 specularColor = min(uDiffuseColor + vec3(0.2, 0.2, 0.2), 1.0);
 	vec3 lightWeighting = vec3(0.0, 0.0, 0.0);
 	vec3 viewVec = normalize(vViewVector);
 
-	vec3 bump = vec3(0.0, 0.0, 0.0);
-	if (uEnableNormalMap) {
-		bump = normalize(texture2D(uNormalMapSampler, vTextureCoord.st).xyz * 2.0 - 1.0);
-	}
+	vec3 bump = normalize(texture2D(uNormalMapSampler, vTextureCoord.st).xyz * 2.0 - 1.0);
 	vec3 refl = reflect(-viewVec, bump);
 
 	for (int i = 0; i < MAX_LIGHTS; ++i) {
@@ -57,7 +54,7 @@ void main(void) {
 				0.0, 1.0);
 		}
 
-		lightWeighting += attenuation * (uLightSpecularColors[i] * specular + uLightDiffuseColors[i] * diffuse);
+		lightWeighting += attenuation * (specularColor * specular + uDiffuseColor * diffuse);
 	}
 
 	lightWeighting += uAmbientColor;

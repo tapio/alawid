@@ -20,7 +20,9 @@
 	var coreShaderProgram;
 
 	function initShaders() {
-		coreShaderProgram = createProgram("core.vert", "core.frag");
+		// We need to determine how many lights the shaders can handle
+		maxLights = Math.min(gl.getParameter(gl.MAX_VARYING_VECTORS)-3, maxLights);
+		coreShaderProgram = createProgram("core.vert", "core.frag", "#define MAX_LIGHTS "+maxLights);
 	}
 
 	// Textures
@@ -217,6 +219,10 @@
 	function webGLStart() {
 		var canvas = document.getElementById("glcanvas");
 		initGL(canvas);
+
+		console.log("WebGL max varying vectors: " + gl.getParameter(gl.MAX_VARYING_VECTORS));
+		console.log("WebGL max fragment uniform vectors: " + gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS));
+
 		initShaders();
 		initTextures();
 
