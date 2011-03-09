@@ -62,6 +62,10 @@ header {
 	right: 10px;
 }
 
+#glinfo {
+	margin: 0 auto;
+}
+
 .infobox {
 	color: gray;
 	background-color: rgba(0, 0, 0, 0.35);
@@ -78,6 +82,7 @@ header {
 #gameover h1 {
 	color: #f00;
 	font-size: 36px;
+	height: 500px;
 }
 
 footer {

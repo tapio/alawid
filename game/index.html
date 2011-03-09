@@ -61,6 +61,7 @@
 		if (event.keyCode == 72) {
 			var el = document.getElementById("help");
 			document.getElementById("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
+			document.getElementById("glinfo").style.display = (el.style.display != 'none' ? 'none' : '');
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
 
@@ -205,6 +206,16 @@
 				player.torch = player.torches > 0 ? torchMaxTime : 0;
 			}
 		}
+
+		// HACK: These cannot be set on webGLStart() :(
+		document.getElementById("glversion").innerHTML = gl.getParameter(gl.VERSION);
+		document.getElementById("glslversion").innerHTML = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
+		document.getElementById("glvendor").innerHTML = gl.getParameter(gl.VENDOR);
+		document.getElementById("glrenderer").innerHTML = gl.getParameter(gl.RENDERER);
+		document.getElementById("glvaryings").innerHTML = gl.getParameter(gl.MAX_VARYING_VECTORS);
+		document.getElementById("glattribs").innerHTML = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+		document.getElementById("glvertuniforms").innerHTML = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
+		document.getElementById("glfraguniforms").innerHTML = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
 	}
 
 	function tick() {
@@ -274,6 +285,7 @@
 		<h1>You died!</h1>
 	</section>
 	<section id="help" class="infobox">
+		<h3>Keys</h3>
 		<ul>
 		<li>Arrows/WASD to move and attack</li>
 		<li>T to toggle torch</li>
@@ -281,6 +293,19 @@
 		<li>H to toggle this help</li>
 		<li>+ to zoom in</li>
 		<li>- to zoom out</li>
+		</ul>
+	</section>
+	<section id="glinfo" class="infobox">
+		<h3>WebGL info</h3>
+		<ul>
+		<li>Version: <span id="glversion">n/a</span></li>
+		<li>Shading language: <span id="glslversion">n/a</span></li>
+		<li>Vendor: <span id="glvendor">n/a</span></li>
+		<li>Renderer: <span id="glrenderer">n/a</span></li>
+		<li>Max varying vectors: <span id="glvaryings">n/a</span></li>
+		<li>Max vertex attribs: <span id="glattribs">n/a</span></li>
+		<li>Max vertex uniform vectors: <span id="glvertuniforms">n/a</span></li>
+		<li>Max fragment uniform vectors: <span id="glfraguniforms">n/a</span></li>
 		</ul>
 	</section>
 	<footer>
