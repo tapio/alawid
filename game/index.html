@@ -108,6 +108,8 @@
 				// Monster AI
 				for (var i = 0; i < monsters.length; ++i)
 					monsters[i].ai();
+			} else if (dx || dy) {
+				addMessage("Cannot move there.");
 			}
 		}
 	}
@@ -168,6 +170,9 @@
 			monsters[i].draw();
 	}
 
+	var messages = [];
+	var maxMessages = 10;
+
 	function handleLogic() {
 		var timeNow = new Date().getTime();
 
@@ -198,6 +203,18 @@
 		$("health").innerHTML = player.condition + "%";
 		$("torch").innerHTML = player.torch + "s";
 		$("torches").innerHTML = player.torches;
+	}
+
+	function addMessage(msg) {
+		messages.push(msg);
+		if (messages.length > maxMessages) messages.splice(0, messages.length - maxMessages);
+		var msgs = "";
+		var colors = "123456789a";
+		fade = colors.length-1;
+		for (var i = messages.length-1; i >= 0; --i, --fade) {
+			msgs += '<span style="color: #'+colors.charAt(fade)+'00000;">'+messages[i]+'</span><br/>';
+		}
+		$("messages").innerHTML = msgs;
 	}
 
 	var frameCounter = 0;
@@ -268,6 +285,7 @@
 			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
 
 		setInterval("doEachSecond()", 1000);
+		addMessage("Welcome.");
 		tick();
 	}
 
@@ -293,6 +311,10 @@
 	</section>
 	<section id="gameover" style="display: none;">
 		<h1>You died!</h1>
+	</section>
+	<section id="messagesbox" class="infobox">
+		<h3>Messages</h3>
+		<div id="messages"></div>
 	</section>
 	<section id="help" class="infobox">
 		<h3>Keys</h3>

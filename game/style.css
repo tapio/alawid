@@ -63,6 +63,12 @@ header {
 	left: 10px;
 }
 
+#messagesbox {
+	position: absolute;
+	top: 100px;
+	left: 10px;
+}
+
 #help {
 	position: absolute;
 	top: 100px;

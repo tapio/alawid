@@ -66,7 +66,6 @@ function Actor(type, pos, texture) {
 			// Attack player
 			dx = sign(Math.round(player.pos[0]) - Math.round(this.pos[0]));
 			dy = sign(Math.round(player.pos[1]) - Math.round(this.pos[1]));
-			console.log(dx, dy);
 		} else {
 			// Wander aimlessly
 			dx = rand(-1, 1);
