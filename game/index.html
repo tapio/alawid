@@ -53,12 +53,14 @@
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
 
-		// Infoboxes
+		// Help
 		if (event.keyCode == 72) {
-			var el = $("help");
-			$("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
-			$("glinfo").style.display = (el.style.display != 'none' ? 'none' : '');
-			el.style.display = (el.style.display != 'none' ? 'none' : '');
+			$("help").style.display = ($("help").style.display != 'none' ? 'none' : '');
+		}
+		// WebGL info
+		if (event.keyCode == 71) {
+			$("fpscounter").style.display = ($("glinfo").style.display != 'none' ? 'none' : '');
+			$("glinfo").style.display = ($("glinfo").style.display != 'none' ? 'none' : '');
 		}
 		// Map
 		if (event.keyCode == 77) {
@@ -277,7 +279,7 @@
 	<header>
 		<h1>WebGL 7DRL</h1>
 	</header>
-	<section id="fpscounter" class="infobox">
+	<section id="fpscounter" class="infobox" style="display: none;">
 		FPS: <span id="fps">0</span>
 	</section>
 	<section id="game">
@@ -298,13 +300,14 @@
 		<li>Arrows/WASD to move and attack</li>
 		<li>T to toggle torch</li>
 		<li>L to enter first-person looking mode</li>
-		<li>M to toggle map overlay</li>
-		<li>H to toggle this help</li>
 		<li>+ to zoom in</li>
 		<li>- to zoom out</li>
+		<li>M to toggle map overlay</li>
+		<li>H to toggle this help</li>
+		<li>G to toggle WebGL info</li>
 		</ul>
 	</section>
-	<section id="glinfo" class="infobox">
+	<section id="glinfo" class="infobox" style="display: none;">
 		<h3>WebGL info</h3>
 		<ul>
 		<li>Version: <span id="glversion">n/a</span></li>
