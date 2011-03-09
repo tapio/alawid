@@ -1,4 +1,20 @@
 
+const SQUARE_VERTICES = [
+	-0.5,-0.5, 0.0,
+	+0.5,-0.5, 0.0,
+	+0.5,+0.5, 0.0,
+	-0.5,+0.5, 0.0
+	];
+const SQUARE_TEXCOORDS = [
+	0.0, 1.0,
+	1.0, 1.0,
+	1.0, 0.0,
+	0.0, 0.0,
+	];
+const SQUARE_INDICES = [
+	0, 1, 2,    0, 2, 3
+	];
+
 function Weapon(name, damage) {
 	this.name = name;
 	this.dmgCnt = damage[0];
@@ -33,23 +49,7 @@ function Actor(type, pos, texture) {
 		this.rightHand = new Weapon("sword", [2, 1, 6]);
 	}
 
-	// Create sprite
-	var vertices = [
-		-0.5,-0.5, 0.0,
-		+0.5,-0.5, 0.0,
-		+0.5,+0.5, 0.0,
-		-0.5,+0.5, 0.0
-		];
-	var texcoords = [
-		0.0, 1.0,
-		1.0, 1.0,
-		1.0, 0.0,
-		0.0, 0.0,
-		];
-	var indices = [
-		0, 1, 2,    0, 2, 3
-		];
-	this.buffer = new VertexBuffer(vertices, texcoords, indices);
+	this.buffer = new VertexBuffer(SQUARE_VERTICES, SQUARE_TEXCOORDS, SQUARE_INDICES);
 
 	this.dead = function() { return this.condition <= 0; }
 
@@ -117,7 +117,7 @@ function Actor(type, pos, texture) {
 		mvPushMatrix();
 		this.pos[2] = 0.1;
 		mat4.translate(mvMatrix, this.pos);
-		gl.uniform1f(curProg.materialShininessUniform, NO_SPECULAR);
+		gl.uniform1f(curProg.materialShininessUniform, 8.0);
 		useTexture(this.texture);
 		this.buffer.draw();
 		mvPopMatrix();
