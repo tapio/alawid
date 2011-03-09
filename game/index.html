@@ -68,8 +68,11 @@
 			el.innerHTML = "<pre>"+world.map.toString()+"</pre>";
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
-
+		// Rest available only when player is alive
 		if (player.dead()) return;
+
+		// First person mode
+		if (pressedKeys[76]) cameraFirstPerson = !cameraFirstPerson;
 		// Torch
 		if (event.keyCode == 84) {
 			if (player.leftHand == "torch") player.leftHand = null;
@@ -88,10 +91,8 @@
 
 	function handleKeys() {
 		if (player.dead()) return;
-		// First person mode
-		cameraFirstPerson = false;
-		if (pressedKeys[76]) {
-			cameraFirstPerson = true;
+		// First person mode looking
+		if (cameraFirstPerson) {
 			if (pressedKeys[37] || pressedKeys[65]) cameraAngle += 0.05; // Left cursor key or A
 			else if (pressedKeys[39] || pressedKeys[68]) cameraAngle -= 0.05; // Right cursor key or D
 
