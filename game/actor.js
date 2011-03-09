@@ -74,6 +74,15 @@ function Actor(type, pos, texture) {
 		this.move([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
 	}
 
+	this.attack = function(opponent) {
+		var dmg = this.rightHand.damage();
+		opponent.condition -= dmg;
+		if (this.type == "player")
+			addMessage("You hit "+opponent.type+" by "+dmg+"!");
+		else if (opponent.type == "player")
+			addMessage("Enemy "+this.type+" hits you by "+dmg+"!");
+	}
+
 	this.move = function(target) {
 		if (this.dead()) return;
 		// Check wall collision
@@ -83,7 +92,7 @@ function Actor(type, pos, texture) {
 		if (this.type != "player") {
 			// Attack
 			if (matchPos(player.pos, target)) {
-				player.condition -= this.rightHand.damage();
+				this.attack(player);
 				return true;
 			}
 		}
@@ -91,10 +100,8 @@ function Actor(type, pos, texture) {
 		for (var i = 0; i < monsters.length; ++i) {
 			if (this != monsters[i] && !monsters[i].dead()) {
 				if (matchPos(monsters[i].pos, target)) {
-					if (this.type == "player") {
-						// Attack
-						monsters[i].condition -= this.rightHand.damage();
-					}
+					if (this.type == "player") // Attack
+						this.attack(monsters[i])
 					return true;
 				}
 			}
@@ -106,6 +113,7 @@ function Actor(type, pos, texture) {
 					if (items[i].type == "torch") {
 						++this.torches;
 						items[i].condition = 0;
+						addMessage("You picked up "+items[i].type+".");
 					}
 				}
 			}
