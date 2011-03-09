@@ -54,9 +54,9 @@
 		pressedKeys[event.keyCode] = true;
 
 		if (event.keyCode == 72) {
-			var el = document.getElementById("help");
-			document.getElementById("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
-			document.getElementById("glinfo").style.display = (el.style.display != 'none' ? 'none' : '');
+			var el = $("help");
+			$("fpscounter").style.display = (el.style.display != 'none' ? 'none' : '');
+			$("glinfo").style.display = (el.style.display != 'none' ? 'none' : '');
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
 
@@ -173,8 +173,8 @@
 		}
 
 		if (player.dead()) {
-			document.getElementById("game").style.display = "none";
-			document.getElementById("gameover").style.display = "block";
+			$("game").style.display = "none";
+			$("gameover").style.display = "block";
 		}
 
 		// Animate lights
@@ -186,16 +186,16 @@
 	}
 
 	function updateUI() {
-		document.getElementById("health").innerHTML = player.condition + "%";
-		document.getElementById("torch").innerHTML = player.torch + "s";
-		document.getElementById("torches").innerHTML = player.torches;
+		$("health").innerHTML = player.condition + "%";
+		$("torch").innerHTML = player.torch + "s";
+		$("torches").innerHTML = player.torches;
 	}
 
 	var frameCounter = 0;
 
 	function doEachSecond() {
 		// Handle FPS
-		document.getElementById("fps").innerHTML = frameCounter;
+		$("fps").innerHTML = frameCounter;
 		frameCounter = 0;
 		// Handle player torch
 		if (player.leftHand == "torch") {
@@ -208,14 +208,14 @@
 		}
 
 		// HACK: These cannot be set on webGLStart() :(
-		document.getElementById("glversion").innerHTML = gl.getParameter(gl.VERSION);
-		document.getElementById("glslversion").innerHTML = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
-		document.getElementById("glvendor").innerHTML = gl.getParameter(gl.VENDOR);
-		document.getElementById("glrenderer").innerHTML = gl.getParameter(gl.RENDERER);
-		document.getElementById("glvaryings").innerHTML = gl.getParameter(gl.MAX_VARYING_VECTORS);
-		document.getElementById("glattribs").innerHTML = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
-		document.getElementById("glvertuniforms").innerHTML = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
-		document.getElementById("glfraguniforms").innerHTML = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+		$("glversion").innerHTML = gl.getParameter(gl.VERSION);
+		$("glslversion").innerHTML = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
+		$("glvendor").innerHTML = gl.getParameter(gl.VENDOR);
+		$("glrenderer").innerHTML = gl.getParameter(gl.RENDERER);
+		$("glvaryings").innerHTML = gl.getParameter(gl.MAX_VARYING_VECTORS);
+		$("glattribs").innerHTML = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+		$("glvertuniforms").innerHTML = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
+		$("glfraguniforms").innerHTML = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
 	}
 
 	function tick() {
@@ -228,7 +228,7 @@
 	}
 
 	function webGLStart() {
-		var canvas = document.getElementById("glcanvas");
+		var canvas = $("glcanvas");
 		initGL(canvas);
 
 		console.log("WebGL max varying vectors: " + gl.getParameter(gl.MAX_VARYING_VECTORS));
