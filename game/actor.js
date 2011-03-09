@@ -61,10 +61,18 @@ function Actor(type, pos, texture) {
 
 	this.ai = function() {
 		if (this.dead() || this.moving) return;
-		var dx = rand(-1, 1);
-		var dy = rand(-1, 1);
-		var target = vec3.create([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
-		this.move(target);
+		var dx = 0, dy = 0;
+		if (this.distance(player.pos) < 3) {
+			// Attack player
+			dx = sign(Math.round(player.pos[0]) - Math.round(this.pos[0]));
+			dy = sign(Math.round(player.pos[1]) - Math.round(this.pos[1]));
+			console.log(dx, dy);
+		} else {
+			// Wander aimlessly
+			dx = rand(-1, 1);
+			dy = rand(-1, 1);
+		}
+		this.move([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
 	}
 
 	this.move = function(target) {

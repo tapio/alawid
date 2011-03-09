@@ -307,6 +307,8 @@ function rand(lo, hi) {
 	return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
 
+function sign(num) { return ((num > 0) ? 1 : ((num < 0) ? -1 : 0)); }
+
 function roundvec(vec) {
 	return vec3.create([Math.round(vec[0]), Math.round(vec[1]), Math.round(vec[2])]);
 }
