@@ -30,18 +30,13 @@
 	var textures = {};
 
 	function initTextures() {
-		textures["player"] = loadTexture("textures/char.png");
-		textures["player_normalmap"] = loadTexture("textures/char_normalmap.png");
-		textures["rat"] = loadTexture("textures/rat.png");
-		textures["rat_normalmap"] = loadTexture("textures/rat_normalmap.png");
-		textures["goblin"] = loadTexture("textures/goblin.png");
-		textures["goblin_normalmap"] = loadTexture("textures/goblin_normalmap.png");
-		textures["torch"] = loadTexture("textures/torch.png");
-		textures["torch_normalmap"] = loadTexture("textures/torch_normalmap.png");
-		textures["floor"] = loadTexture("textures/floor.jpg");
-		textures["floor_normalmap"] = loadTexture("textures/floor_normalmap.jpg");
-		textures["wall"] = loadTexture("textures/wall.jpg");
-		textures["wall_normalmap"] = loadTexture("textures/wall_normalmap.jpg");
+		var tex = ["player.png", "rat.png", "goblin.png", "torch.png", "floor.jpg", "wall.jpg"];
+		for (var i = 0; i < tex.length; ++i) {
+			var key = tex[i].substr(0, tex[i].lastIndexOf('.'));
+			var ext = tex[i].substr(tex[i].lastIndexOf('.'));
+			textures[key] = loadTexture("textures/"+key+ext);
+			textures[key+"_normalmap"] = loadTexture("textures/"+key+"_normalmap"+ext);
+		}
 	}
 
 	// Objects etc.
