@@ -68,7 +68,7 @@ function createProgram(vertexShaderFile, fragmentShaderFile, defines) {
 	program.normalMapSamplerUniform = gl.getUniformLocation(program, "uNormalMapSampler");
 	program.materialShininessUniform = gl.getUniformLocation(program, "uMaterialShininess");
 	program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
-	program.diffuseColorUniform = gl.getUniformLocation(program, "uDiffuseColor");
+	program.specialLightIndexUniform = gl.getUniformLocation(program, "uSpecialLightIndex");
 	program.lightCountUniform = gl.getUniformLocation(program, "uLightCount");
 	program.lightPositionUniform = gl.getUniformLocation(program, "uLightPositions");
 	program.lightAttenuationUniform = gl.getUniformLocation(program, "uLightAttenuations");
@@ -281,6 +281,7 @@ function setLightUniforms() {
 	}
 
 	if (lightCount < lights.length) lights.sort(sortLights);
+	gl.uniform1i(curProg.specialLightIndexUniform, -1);
 
 	var position = [], attenuation = [];
 	for (var i = 0; i < lightCount; ++i) {
@@ -289,10 +290,14 @@ function setLightUniforms() {
 		function concat(a, b) { return a.concat([b[0], b[1], b[2]]); }
 		position = concat(position, lightPos);
 		attenuation = concat(attenuation, lights[i].attenuation);
+		// HACK: identify special exit light
+		if (lights[i].diffuse[2] == 0.9) {
+			gl.uniform1i(curProg.specialLightIndexUniform, i);
+			attenuation[attenuation.length-1] *= 1.5;
+		}
 	}
 	gl.uniform3fv(curProg.lightPositionUniform, position);
 	gl.uniform3fv(curProg.lightAttenuationUniform, attenuation);
-	gl.uniform3fv(curProg.diffuseColorUniform, lights[0].diffuse);
 	gl.uniform3fv(curProg.ambientColorUniform, AMBIENT_LIGHT);
 }
 

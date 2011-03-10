@@ -1,5 +1,5 @@
-// MAX_LIGHTS is defined by calling code
-// Limit varying vectors to 8
+// MAX_LIGHTS is defined by calling code.
+// Limit varying vectors to 8.
 
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;
@@ -17,6 +17,7 @@ varying vec4 vPosition;
 varying vec2 vTextureCoord;
 varying vec3 vViewVector;
 varying vec3 vLightVectors[MAX_LIGHTS];
+
 
 void main(void) {
 	vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);

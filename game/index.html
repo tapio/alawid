@@ -30,7 +30,7 @@
 	var textures = {};
 
 	function initTextures() {
-		var tex = ["player.png", "rat.png", "goblin.png", "torch.png", "floor.jpg", "wall.jpg"];
+		var tex = ["player.png", "rat.png", "kobold.png", "goblin.png", "dragon.png", "torch.png", "health.png", "floor.jpg", "wall.jpg"];
 		for (var i = 0; i < tex.length; ++i) {
 			var key = tex[i].substr(0, tex[i].lastIndexOf('.'));
 			var ext = tex[i].substr(tex[i].lastIndexOf('.'));
@@ -45,6 +45,45 @@
 	var world;
 	var monsters = [];
 	var items = [];
+	var level = 0;
+
+	function nextLevel() {
+		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 7), 0];
+		const kobolds = [0          , rand( 7,10), rand( 8,10), rand(10,12), 0];
+		const goblins = [0          ,           0, rand(10,12), rand(10,12), 0];
+		const lastLevel = 5;
+
+		monsters = []; items = []; lights = [];
+		++level;
+		if (level > lastLevel) {
+			end();
+			$("win").style.display = "block";
+			return;
+		}
+
+		lights[0] = new PointLight();
+		world = new World();
+		// Monsters
+		if (level == lastLevel)
+			monsters.push(new Actor("dragon", world.map.findEmpty()));
+		for (var i = 0; i < rats[level-1]; ++i)
+			monsters.push(new Actor("rat", world.map.findEmpty()));
+		for (var i = 0; i < kobolds[level-1]; ++i)
+			monsters.push(new Actor("kobold", world.map.findEmpty()));
+		for (var i = 0; i < goblins[level-1]; ++i)
+			monsters.push(new Actor("goblin", world.map.findEmpty()));
+		// Items
+		var torches = rand(3,5);
+		for (var i = 0; i < torches; ++i)
+			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
+		var healths = rand(4,6);
+		for (var i = 0; i < healths; ++i)
+			items.push(new Actor("health potion", world.map.findEmpty(), "health"));
+
+		player.pos = vec3.create([world.map.startx, world.map.starty, 0]);
+		player.target = vec3.create([world.map.startx, world.map.starty, 0]);
+	}
+
 
 	// Key handling
 
@@ -69,16 +108,20 @@
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
 		// Rest available only when player is alive
-		if (player.dead()) return;
+		if (player.dead() && secondTimer) return;
 
 		// Movement
 		if (!player.moving && !cameraFirstPerson) {
 			var dx = 0, dy = 0;
 
-			if (pressedKeys[37] || pressedKeys[65]) dx = -1; // Left cursor key or A
-			else if (pressedKeys[39] || pressedKeys[68]) dx = 1; // Right cursor key or D
-			if (pressedKeys[38] || pressedKeys[87]) dy = -1; // Up cursor key or W
-			else if (pressedKeys[40] || pressedKeys[83]) dy = 1; // Down cursor key
+			if (pressedKeys[81] || pressedKeys[103]) { dx = -1; dy = -1; } // Q or 7
+			else if (pressedKeys[69] || pressedKeys[105]) { dx = 1; dy = -1; } // E or 9
+			else if (pressedKeys[90] || pressedKeys[97]) { dx = -1; dy = 1; } // Z or 1
+			else if (pressedKeys[67] || pressedKeys[99]) { dx = 1; dy = 1; } // C or 3
+			if (pressedKeys[37] || pressedKeys[65] || pressedKeys[100]) dx = -1; // Left or A or 4
+			else if (pressedKeys[39] || pressedKeys[68] || pressedKeys[102]) dx = 1; // Right or D or 6
+			if (pressedKeys[38] || pressedKeys[87] || pressedKeys[104]) dy = -1; // Up or W or 8
+			else if (pressedKeys[40] || pressedKeys[83] || pressedKeys[98]) dy = 1; // Down or S or 2
 
 			if ((dx || dy) && player.move([player.pos[0]+dx, player.pos[1]+dy])) {
 				// Monster AI
@@ -94,6 +137,15 @@
 		else if (event.keyCode == 84) {
 			if (player.leftHand == "torch") player.leftHand = null;
 			else if (player.torches > 0) player.leftHand = "torch";
+		}
+		// Potion
+		else if (event.keyCode == 85) {
+			if (player.potions > 0) {
+				--player.potions;
+				var cure = rand(10,20);
+				player.condition = Math.min(player.condition + cure, 100);
+				addMessage("You drink a potion and it heals you by "+cure+"!");
+			}
 		}
 		// Zoom
 		else if (event.keyCode == 107 || event.keyCode == 187)
@@ -188,7 +240,7 @@
 		}
 
 		if (player.dead()) {
-			$("game").style.display = "none";
+			end();
 			$("gameover").style.display = "block";
 		}
 
@@ -203,6 +255,7 @@
 	function updateUI() {
 		$("health").innerHTML = player.condition + "%";
 		$("torch").innerHTML = player.torch + "s";
+		$("potions").innerHTML = player.potions;
 		$("torches").innerHTML = player.torches;
 	}
 
@@ -236,14 +289,23 @@
 		}
 	}
 
+	function end() {
+		$("game").style.display = "none";
+		window.clearInterval(secondTimer);
+		secondTimer = undefined;
+	}
+
 	function tick() {
-		requestAnimFrame(tick);
+		if (secondTimer) requestAnimFrame(tick);
+		else return;
 		handleKeys();
 		handleLogic();
 		drawScene();
 		updateUI();
 		++frameCounter;
 	}
+
+	var secondTimer;
 
 	function webGLStart() {
 		var canvas = $("glcanvas");
@@ -264,6 +326,7 @@
 
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		gl.depthFunc(gl.LEQUAL);
 		gl.cullFace(gl.FRONT);
 		gl.enable(gl.BLEND);
 		gl.enable(gl.DEPTH_TEST);
@@ -272,18 +335,10 @@
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
 
-		lights[0] = new PointLight();
-		world = new World();
-		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
-		for (var i = 0; i < 20; ++i) {
-			var type = rand(0,1) ? "rat" : "goblin";
-			monsters.push(new Actor(type, world.map.findEmpty(), type));
-		}
-		var torches = rand(4,6);
-		for (var i = 0; i < torches; ++i)
-			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
+		player = new Actor("player");
+		nextLevel();
 
-		setInterval("doEachSecond()", 1000);
+		secondTimer = window.setInterval("doEachSecond()", 1000);
 		addMessage("Welcome.");
 		tick();
 	}
@@ -305,13 +360,22 @@
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
 		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100s</span></span>
+		</p></p>
+		<span class="uitext"><span class="potionslabel">Potions:</span> <span id="potions">-</span></span>
 		<span class="uitext"><span class="torcheslabel">Torches:</span> <span id="torches">-</span></span>
 		</p>
 	</section>
 	<section id="gameover" style="display: none;">
 		<h1>You died!</h1>
 		<form>
-			<input type="button" value="Play again" onClick="window.location.reload()">
+			<input type="button" value="Try again" onClick="window.location.reload()">
+		</form>
+	</section>
+	<section id="win" style="display: none;">
+		<h1>You won!</h1>
+		<h2>Congrats.</h2>
+		<form>
+			<input type="button" value="Now do it again." onClick="window.location.reload()">
 		</form>
 	</section>
 	<section id="messagesbox" class="infobox">
@@ -321,8 +385,9 @@
 	<section id="help" class="infobox">
 		<h3>Keys</h3>
 		<ul>
-		<li>Arrows/WASD to move and attack</li>
+		<li>Arrows/Numpad/WASD to move and attack</li>
 		<li>T to toggle torch</li>
+		<li>U to use potion</li>
 		<li>L to enter first-person looking mode</li>
 		<li>+ to zoom in</li>
 		<li>- to zoom out</li>

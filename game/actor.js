@@ -29,12 +29,12 @@ function Weapon(name, damage) {
 	}
 }
 
-const torchMaxTime = 60;
+const torchMaxTime = 40;
 
 function Actor(type, pos, texture) {
 	this.type = type;
 	this.pos = pos || vec3.create(0.0, 0.0, 0.0);
-	this.texture = texture;
+	this.texture = texture || type;
 	this.target = this.pos;
 	this.moving = false;
 	this.condition = 100.0;
@@ -43,10 +43,19 @@ function Actor(type, pos, texture) {
 		this.leftHand = "torch";
 		this.torch = torchMaxTime;
 		this.torches = 3;
+		this.potions = 1;
 	} else if (type == "rat") {
-		this.rightHand = new Weapon("teeth", [1, 1, 6]);
+		this.rightHand = new Weapon("teeth", [1, 1, 4]);
+		this.condition = 40;
+	} else if (type == "kobold") {
+		this.rightHand = new Weapon("spear", [1, 1, 6]);
+		this.condition = 55;
 	} else if (type == "goblin") {
-		this.rightHand = new Weapon("sword", [2, 1, 6]);
+		this.condition = 70;
+		this.rightHand = new Weapon("crude sword", [2, 1, 4]);
+	} else if (type == "dragon") {
+		this.condition = 200;
+		this.rightHand = new Weapon("fire breath", [3, 4, 7]);
 	}
 
 	this.buffer = new VertexBuffer(SQUARE_VERTICES, SQUARE_TEXCOORDS, SQUARE_INDICES);
@@ -61,11 +70,22 @@ function Actor(type, pos, texture) {
 
 	this.ai = function() {
 		if (this.dead() || this.moving) return;
-		var dx = 0, dy = 0;
-		if (this.distance(player.pos) < 3) {
-			// Attack player
-			dx = sign(Math.round(player.target[0]) - Math.round(this.pos[0]));
-			dy = sign(Math.round(player.target[1]) - Math.round(this.pos[1]));
+		var dx = Math.round(player.target[0]) - Math.round(this.pos[0]);
+		var dy = Math.round(player.target[1]) - Math.round(this.pos[1]);
+		var seeDist = (this.type == "dragon" ? 7 : 3);
+		if (player.leftHand == "torch") ++seeDist;
+		if (Math.max(Math.abs(dx), Math.abs(dy)) < seeDist) {
+			if (this.type == "rat" && player.leftHand == "torch"
+				&& Math.max(Math.abs(dx), Math.abs(dy)) == 2)
+			{
+				// Rats are afraid of light
+				dx = -sign(dx);
+				dy = -sign(dy);
+			} else {
+				// Attack player
+				dx = sign(dx);
+				dy = sign(dy);
+			}
 		} else {
 			// Wander aimlessly
 			dx = rand(-1, 1);
@@ -117,7 +137,12 @@ function Actor(type, pos, texture) {
 						++this.torches;
 						items[i].condition = 0;
 						addMessage("You picked up "+items[i].type+".");
+					} else if (items[i].type == "health potion") {
+						++this.potions;
+						items[i].condition = 0;
+						addMessage("You picked up "+items[i].type+".");
 					}
+
 				}
 			}
 		}
@@ -129,6 +154,13 @@ function Actor(type, pos, texture) {
 
 	this.updateMoving = function() {
 		if (this.dead()) return;
+		// Check for exit
+		if (this.type == "player") {
+			if (world.map.levelData[Math.round(this.pos[1])][Math.round(this.pos[0])] == 'X') {
+				nextLevel();
+				return;
+			}
+		}
 		vec3.lerp(this.pos, this.target, 0.2);
 		if (Math.abs(this.pos[0]-this.target[0]) + Math.abs(this.pos[1]-this.target[1]) < 0.01) {
 			this.moving = false;
