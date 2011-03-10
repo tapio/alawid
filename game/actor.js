@@ -135,6 +135,7 @@ function Actor(type, pos, texture) {
 				if (!items[i].dead() && matchPos(items[i].pos, target)) {
 					if (items[i].type == "torch") {
 						++this.torches;
+						if (player.leftHand != "torch") player.torch = torchMaxTime;
 						items[i].condition = 0;
 						addMessage("You picked up "+items[i].type+".");
 					} else if (items[i].type == "health potion") {
