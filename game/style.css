@@ -96,10 +96,30 @@ header {
 	text-align: center;
 }
 
+#gameover {
+	height: 500px;
+}
+
 #gameover h1 {
 	color: #f00;
 	font-size: 36px;
-	height: 500px;
+}
+
+#gameover form {
+	text-align: center;
+}
+
+input[type=button] {
+	color: #fff;
+	background-color: #333;
+	border-color: #555;
+	display: inline-block;
+	padding: 5px 20px 5px 20px;
+	text-decoration: none;
+	font-weight: bold;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
 }
 
 footer {
