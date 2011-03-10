@@ -29,7 +29,7 @@ function Weapon(name, damage) {
 	}
 }
 
-const torchMaxTime = 60;
+const torchMaxTime = 40;
 
 function Actor(type, pos, texture) {
 	this.type = type;
@@ -69,7 +69,7 @@ function Actor(type, pos, texture) {
 		if (this.dead() || this.moving) return;
 		var dx = Math.round(player.target[0]) - Math.round(this.pos[0]);
 		var dy = Math.round(player.target[1]) - Math.round(this.pos[1]);
-		if (Math.max(Math.abs(dx), Math.abs(dy)) < 3) {
+		if (Math.max(Math.abs(dx), Math.abs(dy)) < (player.leftHand == "torch" ? 4 : 3)) {
 			if (this.type == "rat" && player.leftHand == "torch"
 				&& Math.max(Math.abs(dx), Math.abs(dy)) == 2)
 			{

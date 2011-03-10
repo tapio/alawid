@@ -1,4 +1,7 @@
 
+/**
+ * @brief Generates and manages a 2d ASCII map.
+ */
 function DungeonMap(w, h) {
 	this.levelData = [];
 
@@ -155,6 +158,11 @@ function DungeonMap(w, h) {
 }
 
 
+/**
+ * @brief Contains the world map and mesh.
+ *
+ * This class generates a 3d mesh for a 2d map and draws it.
+ */
 function World() {
 	const s = 35.0;
 	const wallMargin = 0.2;
