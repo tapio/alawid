@@ -34,7 +34,7 @@ const torchMaxTime = 60;
 function Actor(type, pos, texture) {
 	this.type = type;
 	this.pos = pos || vec3.create(0.0, 0.0, 0.0);
-	this.texture = texture;
+	this.texture = texture || type;
 	this.target = this.pos;
 	this.moving = false;
 	this.condition = 100.0;
@@ -149,6 +149,13 @@ function Actor(type, pos, texture) {
 
 	this.updateMoving = function() {
 		if (this.dead()) return;
+		// Check for exit
+		if (this.type == "player") {
+			if (world.map.levelData[Math.round(this.pos[1])][Math.round(this.pos[0])] == 'X') {
+				nextLevel();
+				return;
+			}
+		}
 		vec3.lerp(this.pos, this.target, 0.2);
 		if (Math.abs(this.pos[0]-this.target[0]) + Math.abs(this.pos[1]-this.target[1]) < 0.01) {
 			this.moving = false;

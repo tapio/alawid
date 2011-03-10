@@ -45,6 +45,29 @@
 	var world;
 	var monsters = [];
 	var items = [];
+	var level = 0;
+
+	function nextLevel() {
+		++level;
+		monsters = []; items = []; lights = [];
+
+		lights[0] = new PointLight();
+		world = new World();
+		for (var i = 0; i < 20; ++i) {
+			var type = rand(0,2) ? (rand(0,1) ? "goblin" : "kobold") : "rat";
+			monsters.push(new Actor(type, world.map.findEmpty(), type));
+		}
+		var torches = rand(3,6);
+		for (var i = 0; i < torches; ++i)
+			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
+		var healths = rand(2,4);
+		for (var i = 0; i < healths; ++i)
+			items.push(new Actor("health potion", world.map.findEmpty(), "health"));
+
+		player.pos = vec3.create([world.map.startx, world.map.starty, 0]);
+		player.target = vec3.create([world.map.startx, world.map.starty, 0]);
+	}
+
 
 	// Key handling
 
@@ -287,19 +310,8 @@
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
 
-		lights[0] = new PointLight();
-		world = new World();
-		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
-		for (var i = 0; i < 20; ++i) {
-			var type = rand(0,2) ? (rand(0,1) ? "goblin" : "kobold") : "rat";
-			monsters.push(new Actor(type, world.map.findEmpty(), type));
-		}
-		var torches = rand(3,6);
-		for (var i = 0; i < torches; ++i)
-			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
-		var healths = rand(2,4);
-		for (var i = 0; i < healths; ++i)
-			items.push(new Actor("health potion", world.map.findEmpty(), "health"));
+		player = new Actor("player");
+		nextLevel();
 
 		setInterval("doEachSecond()", 1000);
 		addMessage("Welcome.");
