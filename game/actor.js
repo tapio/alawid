@@ -46,9 +46,12 @@ function Actor(type, pos, texture) {
 		this.potions = 1;
 	} else if (type == "rat") {
 		this.rightHand = new Weapon("teeth", [1, 1, 4]);
+		this.condition = 40;
 	} else if (type == "kobold") {
 		this.rightHand = new Weapon("spear", [1, 1, 6]);
+		this.condition = 55;
 	} else if (type == "goblin") {
+		this.condition = 70;
 		this.rightHand = new Weapon("crude sword", [2, 1, 4]);
 	}
 
