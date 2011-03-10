@@ -1,5 +1,5 @@
-// MAX_LIGHTS is defined by calling code
-// Limit varying vectors to 8
+// MAX_LIGHTS is defined by calling code.
+// Limit varying vectors to 8.
 
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;

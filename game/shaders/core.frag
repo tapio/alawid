@@ -2,15 +2,15 @@
 precision highp float;
 #endif
 
-// MAX_LIGHTS is defined by calling code
-// Limit varying vectors to 8 and uniform vectors to 16
+// MAX_LIGHTS is defined by calling code.
+// Limit varying vectors to 8 and uniform vectors to 16.
 
 uniform float uMaterialShininess;
 
 uniform vec3 uAmbientColor;
-uniform vec3 uDiffuseColor;
 
 uniform int uLightCount;
+uniform int uSpecialLightIndex;
 uniform vec3 uLightPositions[MAX_LIGHTS];
 uniform vec3 uLightAttenuations[MAX_LIGHTS];
 
@@ -24,7 +24,9 @@ varying vec3 vLightVectors[MAX_LIGHTS];
 
 
 void main(void) {
-	vec3 specularColor = min(uDiffuseColor + vec3(0.2, 0.2, 0.2), 1.0);
+	const vec3 diffuseColor = vec3(0.9, 0.6, 0.1);
+	const vec3 specialColor = vec3(0.6, 0.1, 0.9);
+
 	vec3 lightWeighting = vec3(0.0, 0.0, 0.0);
 	vec3 viewVec = normalize(vViewVector);
 
@@ -33,6 +35,9 @@ void main(void) {
 
 	for (int i = 0; i < MAX_LIGHTS; ++i) {
 		if (i >= uLightCount) break;
+		vec3 lightColor = diffuseColor;
+		if (i == uSpecialLightIndex) lightColor = specialColor;
+		vec3 specularColor = min(lightColor + vec3(0.2, 0.2, 0.2), 1.0);
 		vec3 lightVec = normalize(vLightVectors[i]);
 		float diffuse = max(dot(lightVec, bump), 0.0);
 
@@ -54,7 +59,7 @@ void main(void) {
 				0.0, 1.0);
 		}
 
-		lightWeighting += attenuation * (specularColor * specular + uDiffuseColor * diffuse);
+		lightWeighting += attenuation * (specularColor * specular + lightColor * diffuse);
 	}
 
 	lightWeighting += uAmbientColor;

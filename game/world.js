@@ -96,6 +96,22 @@ function DungeonMap(w, h) {
 				++i;
 			}
 		}
+		// Pick exit
+		while (true) {
+			var i = rand(1, this.width()-2);
+			var j = rand(1, this.height()-2);
+			if (this.levelData[j][i] == "#") {
+				var wallCount = 0;
+				if (this.levelData[j-1][i] == "#") ++wallCount;
+				if (this.levelData[j+1][i] == "#") ++wallCount;
+				if (this.levelData[j][i-1] == "#") ++wallCount;
+				if (this.levelData[j][i+1] == "#") ++wallCount;
+				if (wallCount == 3) {
+					this.levelData[j][i] = "X";
+					break;
+				}
+			}
+		}
 	}
 
 	this.width = function() { return this.levelData[0].length; }
@@ -201,7 +217,11 @@ function World() {
 				var c = row[i];
 				if (c == '*') {
 					lights.push(new PointLight([i, j, Math.random((this.wallHeight-1) * 0.9) + 1]));
-				} else if (c == '#' || c == '+') {
+				} else if (c == 'X') {
+					c = '+';
+					lights.push(new PointLight([i, j, 0.7], [0, 0, 0.9]));
+				}
+				if (c == '#' || c == '+') {
 					var marg = (c == '+' ? wallMargin * 2.0 : wallMargin);
 					// Corner points
 					var north = false, south = false, west = false, east = false;
