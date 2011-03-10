@@ -18,6 +18,7 @@ varying vec2 vTextureCoord;
 varying vec3 vViewVector;
 varying vec3 vLightVectors[MAX_LIGHTS];
 
+
 void main(void) {
 	vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
 	vTextureCoord = aTextureCoord;

@@ -53,6 +53,9 @@ function Actor(type, pos, texture) {
 	} else if (type == "goblin") {
 		this.condition = 70;
 		this.rightHand = new Weapon("crude sword", [2, 1, 4]);
+	} else if (type == "dragon") {
+		this.condition = 200;
+		this.rightHand = new Weapon("fire breath", [3, 4, 7]);
 	}
 
 	this.buffer = new VertexBuffer(SQUARE_VERTICES, SQUARE_TEXCOORDS, SQUARE_INDICES);
@@ -69,7 +72,9 @@ function Actor(type, pos, texture) {
 		if (this.dead() || this.moving) return;
 		var dx = Math.round(player.target[0]) - Math.round(this.pos[0]);
 		var dy = Math.round(player.target[1]) - Math.round(this.pos[1]);
-		if (Math.max(Math.abs(dx), Math.abs(dy)) < (player.leftHand == "torch" ? 4 : 3)) {
+		var seeDist = (this.type == "dragon" ? 7 : 3);
+		if (player.leftHand == "torch") ++seeDist;
+		if (Math.max(Math.abs(dx), Math.abs(dy)) < seeDist) {
 			if (this.type == "rat" && player.leftHand == "torch"
 				&& Math.max(Math.abs(dx), Math.abs(dy)) == 2)
 			{

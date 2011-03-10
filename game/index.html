@@ -30,7 +30,7 @@
 	var textures = {};
 
 	function initTextures() {
-		var tex = ["player.png", "rat.png", "kobold.png", "goblin.png", "torch.png", "health.png", "floor.jpg", "wall.jpg"];
+		var tex = ["player.png", "rat.png", "kobold.png", "goblin.png", "dragon.png", "torch.png", "health.png", "floor.jpg", "wall.jpg"];
 		for (var i = 0; i < tex.length; ++i) {
 			var key = tex[i].substr(0, tex[i].lastIndexOf('.'));
 			var ext = tex[i].substr(tex[i].lastIndexOf('.'));
@@ -51,16 +51,21 @@
 		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 7), 0];
 		const kobolds = [0          , rand( 7,10), rand( 8,10), rand(10,12), 0];
 		const goblins = [0          ,           0, rand(10,12), rand(10,12), 0];
+		const lastLevel = 5;
 
 		monsters = []; items = []; lights = [];
 		++level;
-		if (level >= 5) {
+		if (level > lastLevel) {
+			end();
+			$("win").style.display = "block";
 			return;
 		}
 
 		lights[0] = new PointLight();
 		world = new World();
 		// Monsters
+		if (level == lastLevel)
+			monsters.push(new Actor("dragon", world.map.findEmpty()));
 		for (var i = 0; i < rats[level-1]; ++i)
 			monsters.push(new Actor("rat", world.map.findEmpty()));
 		for (var i = 0; i < kobolds[level-1]; ++i)
@@ -103,7 +108,7 @@
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
 		// Rest available only when player is alive
-		if (player.dead()) return;
+		if (player.dead() && secondTimer) return;
 
 		// Movement
 		if (!player.moving && !cameraFirstPerson) {
@@ -235,7 +240,7 @@
 		}
 
 		if (player.dead()) {
-			$("game").style.display = "none";
+			end();
 			$("gameover").style.display = "block";
 		}
 
@@ -284,14 +289,23 @@
 		}
 	}
 
+	function end() {
+		$("game").style.display = "none";
+		window.clearInterval(secondTimer);
+		secondTimer = undefined;
+	}
+
 	function tick() {
-		requestAnimFrame(tick);
+		if (secondTimer) requestAnimFrame(tick);
+		else return;
 		handleKeys();
 		handleLogic();
 		drawScene();
 		updateUI();
 		++frameCounter;
 	}
+
+	var secondTimer;
 
 	function webGLStart() {
 		var canvas = $("glcanvas");
@@ -324,7 +338,7 @@
 		player = new Actor("player");
 		nextLevel();
 
-		setInterval("doEachSecond()", 1000);
+		secondTimer = window.setInterval("doEachSecond()", 1000);
 		addMessage("Welcome.");
 		tick();
 	}
@@ -354,7 +368,14 @@
 	<section id="gameover" style="display: none;">
 		<h1>You died!</h1>
 		<form>
-			<input type="button" value="Play again" onClick="window.location.reload()">
+			<input type="button" value="Try again" onClick="window.location.reload()">
+		</form>
+	</section>
+	<section id="win" style="display: none;">
+		<h1>You won!</h1>
+		<h2>Congrats.</h2>
+		<form>
+			<input type="button" value="Now do it again." onClick="window.location.reload()">
 		</form>
 	</section>
 	<section id="messagesbox" class="infobox">

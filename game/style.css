@@ -9,6 +9,13 @@ body {
 h1 {
 	color: #343;
 	text-align: center;
+	font-size: 36px;
+}
+
+h2 {
+	color: #44b;
+	text-align: center;
+	font-size: 24px;
 }
 
 p {
@@ -84,16 +91,11 @@ header {
 	text-align: center;
 }
 
-#gameover {
-	height: 500px;
-}
+#gameover, #win { height: 500px; }
+#gameover h1 { color: #f00; }
+#win h1 { color: #080; }
 
-#gameover h1 {
-	color: #f00;
-	font-size: 36px;
-}
-
-#gameover form {
+form {
 	text-align: center;
 }
 
