@@ -43,10 +43,13 @@ function Actor(type, pos, texture) {
 		this.leftHand = "torch";
 		this.torch = torchMaxTime;
 		this.torches = 3;
+		this.potions = 1;
 	} else if (type == "rat") {
-		this.rightHand = new Weapon("teeth", [1, 1, 6]);
+		this.rightHand = new Weapon("teeth", [1, 1, 4]);
+	} else if (type == "kobold") {
+		this.rightHand = new Weapon("spear", [1, 1, 6]);
 	} else if (type == "goblin") {
-		this.rightHand = new Weapon("sword", [2, 1, 6]);
+		this.rightHand = new Weapon("crude sword", [2, 1, 4]);
 	}
 
 	this.buffer = new VertexBuffer(SQUARE_VERTICES, SQUARE_TEXCOORDS, SQUARE_INDICES);
@@ -117,7 +120,12 @@ function Actor(type, pos, texture) {
 						++this.torches;
 						items[i].condition = 0;
 						addMessage("You picked up "+items[i].type+".");
+					} else if (items[i].type == "health potion") {
+						++this.potions;
+						items[i].condition = 0;
+						addMessage("You picked up "+items[i].type+".");
 					}
+
 				}
 			}
 		}

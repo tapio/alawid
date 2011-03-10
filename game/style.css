@@ -20,29 +20,17 @@ p {
 	margin: 10px 10px 10px 10px;
 }
 
-.healthlabel {
-	color: #700;
-}
+.healthlabel { color: #700; }
+#health { color: #811; }
 
-#health {
-	color: #811;
-}
+.potionslabel { color: #603; }
+#potions { color: #704; }
 
-.torchlabel {
-	color: #630;
-}
+.torchlabel { color: #630; }
+#torch { color: #741; }
 
-#torch {
-	color: #741;
-}
-
-.torcheslabel {
-	color: #540;
-}
-
-#torches {
-	color: #651;
-}
+.torcheslabel { color: #540; }
+#torches { color: #651; }
 
 header {
 	height: 100px;

@@ -95,6 +95,15 @@
 			if (player.leftHand == "torch") player.leftHand = null;
 			else if (player.torches > 0) player.leftHand = "torch";
 		}
+		// Potion
+		else if (event.keyCode == 85) {
+			if (player.potions > 0) {
+				--player.potions;
+				var cure = rand(10,20);
+				player.condition = Math.min(player.condition + cure, 100);
+				addMessage("You drink a potion and it heals you by "+cure+"!");
+			}
+		}
 		// Zoom
 		else if (event.keyCode == 107 || event.keyCode == 187)
 			cameraHeight = Math.max(cameraHeight - 0.5, cameraMinHeight);
@@ -203,6 +212,7 @@
 	function updateUI() {
 		$("health").innerHTML = player.condition + "%";
 		$("torch").innerHTML = player.torch + "s";
+		$("potions").innerHTML = player.potions;
 		$("torches").innerHTML = player.torches;
 	}
 
@@ -276,12 +286,15 @@
 		world = new World();
 		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
 		for (var i = 0; i < 20; ++i) {
-			var type = rand(0,1) ? "rat" : "goblin";
+			var type = rand(0,3) ? (rand(0,1) ? "goblin" : "kobold") : "rat";
 			monsters.push(new Actor(type, world.map.findEmpty(), type));
 		}
-		var torches = rand(4,6);
+		var torches = rand(3,6);
 		for (var i = 0; i < torches; ++i)
 			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
+		var healths = rand(2,4);
+		for (var i = 0; i < healths; ++i)
+			items.push(new Actor("health potion", world.map.findEmpty(), "health"));
 
 		setInterval("doEachSecond()", 1000);
 		addMessage("Welcome.");
@@ -305,6 +318,8 @@
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
 		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100s</span></span>
+		</p></p>
+		<span class="uitext"><span class="potionslabel">Potions:</span> <span id="potions">-</span></span>
 		<span class="uitext"><span class="torcheslabel">Torches:</span> <span id="torches">-</span></span>
 		</p>
 	</section>
@@ -323,6 +338,7 @@
 		<ul>
 		<li>Arrows/WASD to move and attack</li>
 		<li>T to toggle torch</li>
+		<li>U to use potion</li>
 		<li>L to enter first-person looking mode</li>
 		<li>+ to zoom in</li>
 		<li>- to zoom out</li>
