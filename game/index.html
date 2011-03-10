@@ -75,10 +75,14 @@
 		if (!player.moving && !cameraFirstPerson) {
 			var dx = 0, dy = 0;
 
-			if (pressedKeys[37] || pressedKeys[65]) dx = -1; // Left cursor key or A
-			else if (pressedKeys[39] || pressedKeys[68]) dx = 1; // Right cursor key or D
-			if (pressedKeys[38] || pressedKeys[87]) dy = -1; // Up cursor key or W
-			else if (pressedKeys[40] || pressedKeys[83]) dy = 1; // Down cursor key
+			if (pressedKeys[81] || pressedKeys[103]) { dx = -1; dy = -1; } // Q or 7
+			else if (pressedKeys[69] || pressedKeys[105]) { dx = 1; dy = -1; } // E or 9
+			else if (pressedKeys[90] || pressedKeys[97]) { dx = -1; dy = 1; } // Z or 1
+			else if (pressedKeys[67] || pressedKeys[99]) { dx = 1; dy = 1; } // C or 3
+			if (pressedKeys[37] || pressedKeys[65] || pressedKeys[100]) dx = -1; // Left or A or 4
+			else if (pressedKeys[39] || pressedKeys[68] || pressedKeys[102]) dx = 1; // Right or D or 6
+			if (pressedKeys[38] || pressedKeys[87] || pressedKeys[104]) dy = -1; // Up or W or 8
+			else if (pressedKeys[40] || pressedKeys[83] || pressedKeys[98]) dy = 1; // Down or S or 2
 
 			if ((dx || dy) && player.move([player.pos[0]+dx, player.pos[1]+dy])) {
 				// Monster AI
@@ -337,7 +341,7 @@
 	<section id="help" class="infobox">
 		<h3>Keys</h3>
 		<ul>
-		<li>Arrows/WASD to move and attack</li>
+		<li>Arrows/Numpad/WASD to move and attack</li>
 		<li>T to toggle torch</li>
 		<li>U to use potion</li>
 		<li>L to enter first-person looking mode</li>
