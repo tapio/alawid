@@ -48,19 +48,30 @@
 	var level = 0;
 
 	function nextLevel() {
-		++level;
+		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 7), 0];
+		const kobolds = [0          , rand( 7,10), rand( 8,10), rand(10,12), 0];
+		const goblins = [0          ,           0, rand(10,12), rand(10,12), 0];
+
 		monsters = []; items = []; lights = [];
+		++level;
+		if (level >= 5) {
+			return;
+		}
 
 		lights[0] = new PointLight();
 		world = new World();
-		for (var i = 0; i < 20; ++i) {
-			var type = rand(0,2) ? (rand(0,1) ? "goblin" : "kobold") : "rat";
-			monsters.push(new Actor(type, world.map.findEmpty(), type));
-		}
-		var torches = rand(3,6);
+		// Monsters
+		for (var i = 0; i < rats[level-1]; ++i)
+			monsters.push(new Actor("rat", world.map.findEmpty()));
+		for (var i = 0; i < kobolds[level-1]; ++i)
+			monsters.push(new Actor("kobold", world.map.findEmpty()));
+		for (var i = 0; i < goblins[level-1]; ++i)
+			monsters.push(new Actor("goblin", world.map.findEmpty()));
+		// Items
+		var torches = rand(3,5);
 		for (var i = 0; i < torches; ++i)
 			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
-		var healths = rand(2,4);
+		var healths = rand(4,6);
 		for (var i = 0; i < healths; ++i)
 			items.push(new Actor("health potion", world.map.findEmpty(), "health"));
 
