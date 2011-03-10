@@ -85,6 +85,8 @@ function DungeonMap(w, h) {
 
 		// Some lights
 		this.placeRandomly("*", rooms/3, true);
+		// Some doors
+		this.placeRandomly("+", rooms, true);
 	}
 
 	this.width = function() { return this.levelData[0].length; }
@@ -106,7 +108,7 @@ function DungeonMap(w, h) {
 			if (x < 0 || y < 0 || x >= this.width() || y >= this.height())
 				return true;
 			var c = this.levelData[y][x];
-			if (c != " " && c != "*") return true;
+			if (c == "#") return true;
 		}
 		return false;
 	}
@@ -150,8 +152,9 @@ function World() {
 		];
 	this.floorBuffer = new VertexBuffer(floorvertices, floortexcoords, floorindices);
 
-	this.createWallFace = function(p0, p1, n) {
+	this.createWallFace = function(p0, p1, n, doorway) {
 		const slices = 3;
+		var doorHeight = doorway ? 1.0 : 0.0;
 		var va = [], ta = [], ia = [];
 		var r0 = 0.0;
 		for (var i = 0; i < slices; ++i) {
@@ -160,15 +163,15 @@ function World() {
 			var q1 = [(p1[0]-p0[0])*f1+p0[0], (p1[1]-p0[1])*f1+p0[1]];
 			var r1 = (i == slices-1) ? 0.0 : Math.random();
 			va = [
-				q0[0]+r0*n[0], q0[1]+r0*n[1], 0.0,
+				q0[0]+r0*n[0], q0[1]+r0*n[1], doorHeight,
 				q0[0]+r0*n[0], q0[1]+r0*n[1], this.wallHeight,
 				q1[0]+r1*n[0], q1[1]+r1*n[1], this.wallHeight,
-				q1[0]+r1*n[0], q1[1]+r1*n[1], 0.0,
+				q1[0]+r1*n[0], q1[1]+r1*n[1], doorHeight,
 				];
 			ta = [
 				0.0, f0,
-				this.wallHeight, f0,
-				this.wallHeight, f1,
+				this.wallHeight-doorHeight, f0,
+				this.wallHeight-doorHeight, f1,
 				0.0, f1,
 			];
 			r0 = r1;
@@ -187,32 +190,37 @@ function World() {
 			var row = data[j];
 			for (var i = 0; i < row.length; ++i) {
 				var c = row[i];
-				if (c == "*") {
+				if (c == '*') {
 					lights.push(new PointLight([i, j, Math.random((this.wallHeight-1) * 0.9) + 1]));
-				} else if (c == '#') {
+				} else if (c == '#' || c == '+') {
+					var marg = (c == '+' ? wallMargin * 2.0 : wallMargin);
 					// Corner points
 					var north = false, south = false, west = false, east = false;
 					var nw = [-halfGrid, -halfGrid], ne = [ halfGrid, -halfGrid];
 					var sw = [-halfGrid,  halfGrid], se = [ halfGrid,  halfGrid];
-					// Adjust corner according to neighbouring walls
-					if (this.map.getBlock([i-1, j]) != "#") {
-						nw[0] += wallMargin;
-						sw[0] += wallMargin;
+					// Adjust corners according to neighbouring walls
+					if (this.map.getBlock([i-1, j]) == "+") west = true;
+					else if (this.map.getBlock([i-1, j]) != "#") {
+						nw[0] += marg;
+						sw[0] += marg;
 						west = true;
 					}
-					if (this.map.getBlock([i+1, j]) != "#") {
-						ne[0] -= wallMargin;
-						se[0] -= wallMargin;
+					if (this.map.getBlock([i+1, j]) == "+") east = true;
+					else if (this.map.getBlock([i+1, j]) != "#") {
+						ne[0] -= marg;
+						se[0] -= marg;
 						east = true;
 					}
-					if (this.map.getBlock([i, j-1]) != "#") {
-						ne[1] += wallMargin;
-						nw[1] += wallMargin;
+					if (this.map.getBlock([i, j-1]) == "+") north = true;
+					else if (this.map.getBlock([i, j-1]) != "#") {
+						ne[1] += marg;
+						nw[1] += marg;
 						north = true;
 					}
-					if (this.map.getBlock([i, j+1]) != "#") {
-						se[1] -= wallMargin;
-						sw[1] -= wallMargin;
+					if (this.map.getBlock([i, j+1]) == "+") south = true;
+					else if (this.map.getBlock([i, j+1]) != "#") {
+						se[1] -= marg;
+						sw[1] -= marg;
 						south = true;
 					}
 					// Fill corners
@@ -224,10 +232,10 @@ function World() {
 					nw = [nw[0]+i, nw[1]+j]; ne = [ne[0]+i, ne[1]+j];
 					sw = [sw[0]+i, sw[1]+j]; se = [se[0]+i, se[1]+j];
 					// Create the faces
-					if (north) this.createWallFace(ne, nw, [0.0, -wallMargin]); // North wall
-					if (east ) this.createWallFace(se, ne, [wallMargin, 0.0]); // East wall
-					if (south) this.createWallFace(sw, se, [0.0, wallMargin]); // South wall
-					if (west ) this.createWallFace(nw, sw, [-wallMargin, 0.0]); // West wall
+					if (north) this.createWallFace(ne, nw, [0.0, -wallMargin], c == '+'); // North wall
+					if (east ) this.createWallFace(se, ne, [wallMargin, 0.0], c == '+'); // East wall
+					if (south) this.createWallFace(sw, se, [0.0, wallMargin], c == '+'); // South wall
+					if (west ) this.createWallFace(nw, sw, [-wallMargin, 0.0], c == '+'); // West wall
 				}
 			}
 		}
