@@ -67,11 +67,12 @@ function Actor(type, pos, texture) {
 
 	this.ai = function() {
 		if (this.dead() || this.moving) return;
-		var dx = 0, dy = 0;
-		if (this.distance(player.pos) < 3) {
+		var dx = Math.round(player.target[0]) - Math.round(this.pos[0]);
+		var dy = Math.round(player.target[1]) - Math.round(this.pos[1]);
+		if (Math.max(Math.abs(dx), Math.abs(dy)) < 3) {
 			// Attack player
-			dx = sign(Math.round(player.target[0]) - Math.round(this.pos[0]));
-			dy = sign(Math.round(player.target[1]) - Math.round(this.pos[1]));
+			dx = sign(dx);
+			dy = sign(dy);
 		} else {
 			// Wander aimlessly
 			dx = rand(-1, 1);
