@@ -70,9 +70,17 @@ function Actor(type, pos, texture) {
 		var dx = Math.round(player.target[0]) - Math.round(this.pos[0]);
 		var dy = Math.round(player.target[1]) - Math.round(this.pos[1]);
 		if (Math.max(Math.abs(dx), Math.abs(dy)) < 3) {
-			// Attack player
-			dx = sign(dx);
-			dy = sign(dy);
+			if (this.type == "rat" && player.leftHand == "torch"
+				&& Math.max(Math.abs(dx), Math.abs(dy)) == 2)
+			{
+				// Rats are afraid of light
+				dx = -sign(dx);
+				dy = -sign(dy);
+			} else {
+				// Attack player
+				dx = sign(dx);
+				dy = sign(dy);
+			}
 		} else {
 			// Wander aimlessly
 			dx = rand(-1, 1);

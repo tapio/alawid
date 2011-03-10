@@ -287,7 +287,7 @@
 		world = new World();
 		player = new Actor("player", [world.map.startx, world.map.starty, 0], "player");
 		for (var i = 0; i < 20; ++i) {
-			var type = rand(0,3) ? (rand(0,1) ? "goblin" : "kobold") : "rat";
+			var type = rand(0,2) ? (rand(0,1) ? "goblin" : "kobold") : "rat";
 			monsters.push(new Actor(type, world.map.findEmpty(), type));
 		}
 		var torches = rand(3,6);
