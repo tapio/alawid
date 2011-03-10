@@ -210,8 +210,6 @@
 		mat4.translate(mvMatrix, [-cameraPos[0], -cameraPos[1], -cameraPos[2]]);
 
 		 // Lighting
-		if (player.leftHand != "torch") lights[0].attenuation = vec3.create([1000, 1000, 1000]);
-		lights[0].position = vec3.create([player.pos[0], player.pos[1], 0.5])
 		setLightUniforms();
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
@@ -225,6 +223,10 @@
 
 	var messages = [];
 	var maxMessages = 10;
+
+	function getAnim(time) {
+		return Math.abs(time - Math.floor(time) - 0.5) * 2.0;
+	}
 
 	function handleLogic() {
 		var timeNow = new Date().getTime();
@@ -247,9 +249,17 @@
 		// Animate lights
 		for (var i = 0; i < lights.length; ++i) {
 			var anim = timeNow / (1000.0 + i);
-			anim = 0.5 * Math.abs(anim - Math.floor(anim) - 0.5) * 2.0;
+			anim = 0.5 * getAnim(anim);
 			lights[i].attenuation = vec3.create([0.0, 0.0, 1.0 + anim]);
 		}
+		// Special handling for player torch
+		if (player.leftHand != "torch") lights[0].attenuation = vec3.create([1000, 1000, 1000]);
+		var jigglyAng = fract(timeNow / 1000.0) * 2 * Math.PI;
+		var jigglyDist = Math.sin(getAnim(timeNow / 240.0)) * 0.2;
+		var jigglydx = Math.cos(jigglyAng) * jigglyDist;
+		var jigglydy = Math.sin(jigglyAng) * jigglyDist;
+		lights[0].position = vec3.create([player.pos[0]+jigglydx, player.pos[1]+jigglydy, 0.5])
+
 	}
 
 	function updateUI() {

@@ -323,6 +323,10 @@ function matchPos(p1, p2) {
 		&& Math.round(p1[1]) == Math.round(p2[1]);
 }
 
+function fract(num) {
+	return num - Math.floor(num);
+}
+
 function $() {
 	var elements = new Array();
 	for (var i = 0; i < arguments.length; ++i) {
