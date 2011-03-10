@@ -30,7 +30,8 @@
 	var textures = {};
 
 	function initTextures() {
-		var tex = ["player.png", "rat.png", "kobold.png", "goblin.png", "dragon.png", "torch.png", "health.png", "floor.jpg", "wall.jpg"];
+		var tex = ["player.png", "rat.png", "kobold.png", "goblin.png", "dragon.png",
+			"torch.png", "health.png", "splatter.png", "floor.jpg", "wall.jpg"];
 		for (var i = 0; i < tex.length; ++i) {
 			var key = tex[i].substr(0, tex[i].lastIndexOf('.'));
 			var ext = tex[i].substr(tex[i].lastIndexOf('.'));
@@ -45,6 +46,7 @@
 	var world;
 	var monsters = [];
 	var items = [];
+	var splatters = [];
 	var level = 0;
 
 	function nextLevel() {
@@ -214,11 +216,13 @@
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
 		world.draw();
-		player.draw();
 		for (var i = 0; i < items.length; ++i)
 			items[i].draw();
+		player.draw();
 		for (var i = 0; i < monsters.length; ++i)
 			monsters[i].draw();
+		for (var i = 0; i < splatters.length; ++i)
+			splatters[i].draw();
 	}
 
 	var messages = [];
@@ -240,6 +244,11 @@
 		for (var i = items.length-1; i >= 0; --i) {
 			if (items[i].dead()) items.splice(i, 1); // Remove dead items
 		}
+		for (var i = splatters.length-1; i >= 0; --i) {
+			if (timeNow - splatters[i].condition > 500)
+				splatters.splice(i, 1); // Remove old splatters
+		}
+
 
 		if (player.dead()) {
 			end();
