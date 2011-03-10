@@ -22,7 +22,8 @@ function DungeonMap(w, h) {
 		while (true) {
 			x = rand(1, this.width()-2);
 			y = rand(1, this.height()-2);
-			if (this.levelData[y][x] != "#") return vec3.create([x, y, 0.0]);
+			if (this.levelData[y][x] != "#" && this.levelData[y][x] != "+")
+				return vec3.create([x, y, 0.0]);
 		}
 	}
 
@@ -86,7 +87,15 @@ function DungeonMap(w, h) {
 		// Some lights
 		this.placeRandomly("*", rooms/3, true);
 		// Some doors
-		this.placeRandomly("+", rooms, true);
+		for (var i = 0; i < rooms;) {
+			var pos = this.findEmpty();
+			if ((this.isWall([pos[0]-1, pos[1]]) && this.isWall([pos[0]+1, pos[1]]))
+				|| (this.isWall([pos[0], pos[1]-1]) && this.isWall([pos[0], pos[1]+1])))
+			{
+				this.levelData[pos[1]][pos[0]] = "+";
+				++i;
+			}
+		}
 	}
 
 	this.width = function() { return this.levelData[0].length; }
