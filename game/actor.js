@@ -64,8 +64,8 @@ function Actor(type, pos, texture) {
 		var dx = 0, dy = 0;
 		if (this.distance(player.pos) < 3) {
 			// Attack player
-			dx = sign(Math.round(player.pos[0]) - Math.round(this.pos[0]));
-			dy = sign(Math.round(player.pos[1]) - Math.round(this.pos[1]));
+			dx = sign(Math.round(player.target[0]) - Math.round(this.pos[0]));
+			dy = sign(Math.round(player.target[1]) - Math.round(this.pos[1]));
 		} else {
 			// Wander aimlessly
 			dx = rand(-1, 1);
@@ -88,10 +88,13 @@ function Actor(type, pos, texture) {
 		// Check wall collision
 		if (world.map.isWall(target))
 			return false;
+		// NOTE: Collisions are checked against Actor.target,
+		// because that is the "real" position disregarding animation.
+
 		// Check monster's collision to player
 		if (this.type != "player") {
 			// Attack
-			if (matchPos(player.pos, target)) {
+			if (matchPos(player.target, target)) {
 				this.attack(player);
 				return true;
 			}
@@ -99,7 +102,7 @@ function Actor(type, pos, texture) {
 		// Collisions to monsters
 		for (var i = 0; i < monsters.length; ++i) {
 			if (this != monsters[i] && !monsters[i].dead()) {
-				if (matchPos(monsters[i].pos, target)) {
+				if (matchPos(monsters[i].target, target)) {
 					if (this.type == "player") // Attack
 						this.attack(monsters[i])
 					return true;
