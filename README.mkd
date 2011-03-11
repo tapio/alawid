@@ -1,15 +1,13 @@
 7DRL
 ====
 
-(This page is WIP)
-
 Made for the [7 Day Roguelike Challenge 2011](http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Contest_2011).
 
 The game is played inside a web browser and requires [WebGL](http://www.khronos.org/webgl/) support, so you need a rather new browser (e.g. Google Chrome 9+ or Firefox 4 - IE won't work). Also, your graphics card needs to be at least OpenGL 2 capable (with decent drivers) for WebGL to work. You can check supported browsers and other notes in [Khrono's WebGL Wiki](http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation).
 
 The game is located in the subdirectory called [game](game/).
 
-Note that running the game locally will not probably work. You need a webserver to answer the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely).
+Note that running the game locally will not probably work. You need a webserver to answer the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely). And yes, I do want shaders in separate files for syntax highlighting and other reasons.
 
 
 Gameplay features
@@ -29,4 +27,8 @@ Graphical/engine features
 * Multiple light sources
 * Normalmapping
 * Does not depend on external engines/frameworks (i.e. custom built)
+
+Licensing stuff
+---------------
+The starting point for this game was a wonderful WebGL tutorial by Giles Thomas @ [learningwebgl.com](http://learningwebgl.com). The content there is licensed [Creative Commons Attribution/Share-Alike license](http://creativecommons.org/licenses/by-sa/3.0/). There are only few small bits left from the original tutorial code, but to avoid pain with licensing jungle, I'll release this for the time being under the same CC-BY-SA license (even though it's not really a software license), with attribution to here and learningwebgl.com.
 
