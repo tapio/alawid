@@ -124,14 +124,16 @@
 			if (pressedKeys[37] || pressedKeys[65] || pressedKeys[100]) dx = -1; // Left or A or 4
 			else if (pressedKeys[39] || pressedKeys[68] || pressedKeys[102]) dx = 1; // Right or D or 6
 			if (pressedKeys[38] || pressedKeys[87] || pressedKeys[104]) dy = -1; // Up or W or 8
-			else if (pressedKeys[40] || pressedKeys[83] || pressedKeys[98]) dy = 1; // Down or S or 2
+			else if (pressedKeys[40] || pressedKeys[83] || pressedKeys[88] || pressedKeys[98]) dy = 1; // Down or S or X or 2
 
-			if ((dx || dy) && player.move([player.pos[0]+dx, player.pos[1]+dy])) {
+			if (dx || dy) {
+				if (!player.move([player.pos[0]+dx, player.pos[1]+dy]))
+					addMessage("Cannot move there.");
+			}
+			if (dx || dy || pressedKeys[101]) {
 				// Monster AI
 				for (var i = 0; i < monsters.length; ++i)
 					monsters[i].ai();
-			} else if (dx || dy) {
-				addMessage("Cannot move there.");
 			}
 		}
 		// First person mode
