@@ -76,10 +76,10 @@
 		for (var i = 0; i < goblins[level-1]; ++i)
 			monsters.push(new Actor("goblin", world.map.findEmpty()));
 		// Items
-		var torches = rand(3,5);
+		var torches = rand(4,6);
 		for (var i = 0; i < torches; ++i)
 			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
-		var healths = rand(4,6);
+		var healths = rand(5,7);
 		for (var i = 0; i < healths; ++i)
 			items.push(new Actor("health potion", world.map.findEmpty(), "health"));
 
@@ -147,7 +147,7 @@
 		else if (event.keyCode == 85) {
 			if (player.potions > 0) {
 				--player.potions;
-				var cure = rand(10,20);
+				var cure = rand(20,30);
 				player.condition = Math.min(player.condition + cure, 100);
 				addMessage("You drink a potion and it heals you by "+cure+"!");
 			}
