@@ -31,7 +31,7 @@
 
 	function initTextures() {
 		var tex = ["player.png", "rat.png", "kobold.png", "goblin.png", "dragon.png",
-			"torch.png", "health.png", "splatter.png", "floor.jpg", "wall.jpg"];
+			"torch.png", "health.png", "treasure.png", "splatter.png", "floor.jpg", "wall.jpg"];
 		for (var i = 0; i < tex.length; ++i) {
 			var key = tex[i].substr(0, tex[i].lastIndexOf('.'));
 			var ext = tex[i].substr(tex[i].lastIndexOf('.'));
@@ -47,14 +47,14 @@
 	var monsters = [];
 	var items = [];
 	var splatters = [];
-	var level = 0;
 	var killCount = 0;
+	var level = 0;
+	const lastLevel = 5;
 
 	function nextLevel() {
-		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 7), 0];
-		const kobolds = [0          , rand( 7,10), rand( 8,10), rand(10,12), 0];
-		const goblins = [0          ,           0, rand(10,12), rand(10,12), 0];
-		const lastLevel = 5;
+		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 6), 0];
+		const kobolds = [0          , rand( 7,10), rand( 7,10), rand(10,12), 0];
+		const goblins = [0          ,           0, rand( 8,10), rand(10,12), 0];
 
 		monsters = []; items = []; lights = [];
 		++level;
@@ -66,9 +66,12 @@
 
 		lights[0] = new PointLight();
 		world = new World();
+		// Last level
+		if (level == lastLevel) {
+			items.push(new Actor("treasure", world.map.findEmpty()));
+			monsters.push(new Actor("dragon", items[items.length-1].pos));
+		}
 		// Monsters
-		if (level == lastLevel)
-			monsters.push(new Actor("dragon", world.map.findEmpty()));
 		for (var i = 0; i < rats[level-1]; ++i)
 			monsters.push(new Actor("rat", world.map.findEmpty()));
 		for (var i = 0; i < kobolds[level-1]; ++i)
@@ -76,10 +79,10 @@
 		for (var i = 0; i < goblins[level-1]; ++i)
 			monsters.push(new Actor("goblin", world.map.findEmpty()));
 		// Items
-		var torches = rand(3,5);
+		var torches = rand(4,6);
 		for (var i = 0; i < torches; ++i)
 			items.push(new Actor("torch", world.map.findEmpty(), "torch"));
-		var healths = rand(4,6);
+		var healths = rand(5,7);
 		for (var i = 0; i < healths; ++i)
 			items.push(new Actor("health potion", world.map.findEmpty(), "health"));
 
@@ -94,6 +97,10 @@
 
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
+
+		// Start game
+		if ($("titlescreen").style.display != 'none')
+			$("titlescreen").style.display = 'none';
 
 		// Help
 		if (event.keyCode == 72) {
@@ -124,14 +131,16 @@
 			if (pressedKeys[37] || pressedKeys[65] || pressedKeys[100]) dx = -1; // Left or A or 4
 			else if (pressedKeys[39] || pressedKeys[68] || pressedKeys[102]) dx = 1; // Right or D or 6
 			if (pressedKeys[38] || pressedKeys[87] || pressedKeys[104]) dy = -1; // Up or W or 8
-			else if (pressedKeys[40] || pressedKeys[83] || pressedKeys[98]) dy = 1; // Down or S or 2
+			else if (pressedKeys[40] || pressedKeys[83] || pressedKeys[88] || pressedKeys[98]) dy = 1; // Down or S or X or 2
 
-			if ((dx || dy) && player.move([player.pos[0]+dx, player.pos[1]+dy])) {
+			if (dx || dy) {
+				if (!player.move([player.pos[0]+dx, player.pos[1]+dy]))
+					addMessage("Cannot move there.");
+			}
+			if (dx || dy || pressedKeys[101]) {
 				// Monster AI
 				for (var i = 0; i < monsters.length; ++i)
 					monsters[i].ai();
-			} else if (dx || dy) {
-				addMessage("Cannot move there.");
 			}
 		}
 		// First person mode
@@ -145,7 +154,7 @@
 		else if (event.keyCode == 85) {
 			if (player.potions > 0) {
 				--player.potions;
-				var cure = rand(10,20);
+				var cure = rand(20,30);
 				player.condition = Math.min(player.condition + cure, 100);
 				addMessage("You drink a potion and it heals you by "+cure+"!");
 			}
@@ -302,7 +311,7 @@
 		$("fps").innerHTML = frameCounter;
 		frameCounter = 0;
 		// Handle player torch
-		if (player.leftHand == "torch") {
+		if (player.leftHand == "torch" && $("titlescreen").style.display == 'none') {
 			player.torch -= 1.0;
 			if (player.torch <= 0) {
 				player.leftHand = null;
@@ -359,12 +368,12 @@
 
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
-
+level = 4;
 		player = new Actor("player");
 		nextLevel();
 
-		secondTimer = window.setInterval("doEachSecond()", 1000);
 		addMessage("Welcome.");
+		secondTimer = window.setInterval("doEachSecond()", 1000);
 		tick();
 	}
 
@@ -382,6 +391,17 @@
 	<section id="game">
 		<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
 		<div id="mapoverlay" class="infobox" style="display: none;"></div>
+		<div id="titlescreen" class="infobox">
+			<h1>An adventure is about to begin!</h1>
+			<p>Descend to the dungeon full of <strong>monsters</strong> and search for the
+			hidden <strong>treasure</strong> that awaits its discoverer. A mysterious
+			<strong>portal</strong> will take you to the next level, but you might want to
+			find and pick up some <strong>supplies</strong> first. It also might be a good
+			idea to avoid excess monster hunting - that'll get you killed eventually.
+			<strong>Sneaking</strong> around enemies just might keep you alive long enough
+			to see the treasure.</p>
+			<p><em>Press any key to begin!</em></p>
+		</div>
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
 		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100s</span></span>

@@ -138,14 +138,15 @@ function Actor(type, pos, texture) {
 					if (items[i].type == "torch") {
 						++this.torches;
 						if (player.leftHand != "torch") player.torch = torchMaxTime;
-						items[i].condition = 0;
 						addMessage("You picked up "+items[i].type+".");
 					} else if (items[i].type == "health potion") {
 						++this.potions;
-						items[i].condition = 0;
 						addMessage("You picked up "+items[i].type+".");
+					} else if (items[i].type == "treasure") {
+						this.treasure = true;
+						addMessage("You found the treasure!");
 					}
-
+					items[i].condition = 0;
 				}
 			}
 		}
@@ -160,8 +161,10 @@ function Actor(type, pos, texture) {
 		// Check for exit
 		if (this.type == "player") {
 			if (world.map.levelData[Math.round(this.pos[1])][Math.round(this.pos[0])] == 'X') {
-				nextLevel();
-				return;
+				if (level != lastLevel || player.treasure) {
+					nextLevel();
+					return;
+				} else addMessage("Get treasure first, it's on this level.");
 			}
 		}
 		vec3.lerp(this.pos, this.target, 0.2);

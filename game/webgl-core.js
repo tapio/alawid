@@ -268,7 +268,7 @@ function PointLight(position, diffuse, attenuation, specular) {
 	this.diffuse = diffuse || vec3.create([0.9, 0.6, 0.1]);
 	this.attenuation = attenuation || vec3.create([0.0, 0.0, 2.0]);
 	this.specular = specular || vec3.create([1.0, 0.7, 0.2]);
-	// NOTE: specular color is hard-coded to shaders and diffuse is global
+	// NOTE: specular and diffuse color are hard-coded to shaders
 	// due to nasty limits in varyings/uniforms
 }
 
@@ -280,7 +280,14 @@ function setLightUniforms() {
 		return player.distance(a.position) - player.distance(b.position);
 	}
 
-	if (lightCount < lights.length) lights.sort(sortLights);
+	if (lightCount < lights.length) {
+		// Player's torch jiggles, so we make artificially
+		// sure that it is the closest one.
+		var torchpos = vec3.create(lights[0].position);
+		lights[0].position = player.pos;
+		lights.sort(sortLights);
+		lights[0].position = torchpos;
+	}
 	gl.uniform1i(curProg.specialLightIndexUniform, -1);
 
 	var position = [], attenuation = [];
