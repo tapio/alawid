@@ -1,5 +1,5 @@
-7DRL
-====
+A Little Anxious When It's Dark
+===============================
 
 Made for the [7 Day Roguelike Challenge 2011](http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Contest_2011).
 
