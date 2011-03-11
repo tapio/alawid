@@ -29,6 +29,14 @@ function Weapon(name, damage) {
 	}
 }
 
+function monsterAt(pos) {
+	for (var i = 0; i < monsters.length; ++i) {
+		if (!monsters[i].dead() && matchPos(monsters[i].target, pos))
+			return monsters[i];
+	}
+	return null;
+}
+
 const torchMaxTime = 40;
 
 function Actor(type, pos, texture) {
@@ -91,6 +99,23 @@ function Actor(type, pos, texture) {
 			dx = rand(-1, 1);
 			dy = rand(-1, 1);
 		} else return;
+
+		// Check if wall and slide if needed
+		if (dx && dy && world.map.isWall([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]])) {
+			// Try horizontal
+			if (!world.map.isWall([this.pos[0]+dx, this.pos[1], this.pos[2]])
+				&& !monsterAt([this.pos[0]+dx, this.pos[1], this.pos[2]]))
+			{
+				dy = 0;
+			// Try vertical
+			} else if (!world.map.isWall([this.pos[0], this.pos[1]+dy, this.pos[2]])
+				&& !monsterAt([this.pos[0], this.pos[1]+dy, this.pos[2]]))
+			{
+				dx = 0;
+			}
+		}
+
+		// Move
 		this.move([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
 	}
 
@@ -122,14 +147,11 @@ function Actor(type, pos, texture) {
 			}
 		}
 		// Collisions to monsters
-		for (var i = 0; i < monsters.length; ++i) {
-			if (this != monsters[i] && !monsters[i].dead()) {
-				if (matchPos(monsters[i].target, target)) {
-					if (this.type == "player") // Attack
-						this.attack(monsters[i])
-					return true;
-				}
-			}
+		var mon = monsterAt(target);
+		if (mon) {
+			if (this.type == "player") // Attack
+				this.attack(mon)
+			return true;
 		}
 		// Collision to items
 		if (this.type == "player") {
