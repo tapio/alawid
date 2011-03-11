@@ -2,7 +2,7 @@
 <html>
 
 <head>
-<title>WebGL 7DRL</title>
+<title>A Little Anxious When It's Dark - A WebGL 7DRL</title>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <link type="text/css" rel="stylesheet" href="style.css" />
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
@@ -30,7 +30,8 @@
 	var textures = {};
 
 	function initTextures() {
-		var tex = ["player.png", "rat.png", "kobold.png", "goblin.png", "dragon.png", "torch.png", "health.png", "floor.jpg", "wall.jpg"];
+		var tex = ["player.png", "rat.png", "kobold.png", "goblin.png", "dragon.png",
+			"torch.png", "health.png", "splatter.png", "floor.jpg", "wall.jpg"];
 		for (var i = 0; i < tex.length; ++i) {
 			var key = tex[i].substr(0, tex[i].lastIndexOf('.'));
 			var ext = tex[i].substr(tex[i].lastIndexOf('.'));
@@ -45,7 +46,9 @@
 	var world;
 	var monsters = [];
 	var items = [];
+	var splatters = [];
 	var level = 0;
+	var killCount = 0;
 
 	function nextLevel() {
 		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 7), 0];
@@ -162,8 +165,8 @@
 		if (player.dead()) return;
 		// First person mode looking
 		if (cameraFirstPerson) {
-			if (pressedKeys[37] || pressedKeys[65]) cameraAngle += 0.05; // Left cursor key or A
-			else if (pressedKeys[39] || pressedKeys[68]) cameraAngle -= 0.05; // Right cursor key or D
+			if (pressedKeys[37] || pressedKeys[65] || pressedKeys[100]) cameraAngle += 0.05; // Left cursor key or A
+			else if (pressedKeys[39] || pressedKeys[68] || pressedKeys[102]) cameraAngle -= 0.05; // Right cursor key or D
 		}
 	}
 
@@ -214,11 +217,13 @@
 		gl.uniform1f(curProg.materialShininessUniform, 512.0);
 
 		world.draw();
-		player.draw();
 		for (var i = 0; i < items.length; ++i)
 			items[i].draw();
+		player.draw();
 		for (var i = 0; i < monsters.length; ++i)
 			monsters[i].draw();
+		for (var i = 0; i < splatters.length; ++i)
+			splatters[i].draw();
 	}
 
 	var messages = [];
@@ -235,11 +240,19 @@
 
 		for (var i = monsters.length-1; i >= 0; --i) {
 			monsters[i].updateMoving();
-			if (monsters[i].dead()) monsters.splice(i, 1); // Remove dead monsters
+			if (monsters[i].dead()) {
+				monsters.splice(i, 1); // Remove dead monsters
+				++killCount;
+			}
 		}
 		for (var i = items.length-1; i >= 0; --i) {
 			if (items[i].dead()) items.splice(i, 1); // Remove dead items
 		}
+		for (var i = splatters.length-1; i >= 0; --i) {
+			if (timeNow - splatters[i].condition > 500)
+				splatters.splice(i, 1); // Remove old splatters
+		}
+
 
 		if (player.dead()) {
 			end();
@@ -301,6 +314,8 @@
 
 	function end() {
 		$("game").style.display = "none";
+		$("killcount-win").innerHTML = killCount;
+		$("killcount-lose").innerHTML = killCount;
 		window.clearInterval(secondTimer);
 		secondTimer = undefined;
 	}
@@ -359,7 +374,7 @@
 
 <body onload="webGLStart();">
 	<header>
-		<h1>WebGL 7DRL</h1>
+		<h1>A Little Anxious When It's Dark</h1>
 	</header>
 	<section id="fpscounter" class="infobox" style="display: none;">
 		FPS: <span id="fps">0</span>
@@ -380,6 +395,7 @@
 		<form>
 			<input type="button" value="Try again" onClick="window.location.reload()">
 		</form>
+		<p>You killed <span id="killcount-lose">0</span> monsters.</p>
 	</section>
 	<section id="win" style="display: none;">
 		<h1>You won!</h1>
@@ -387,6 +403,7 @@
 		<form>
 			<input type="button" value="Now do it again." onClick="window.location.reload()">
 		</form>
+		<p>You killed <span id="killcount-win">0</span> monsters.</p>
 	</section>
 	<section id="messagesbox" class="infobox">
 		<h3>Messages</h3>

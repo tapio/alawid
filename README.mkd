@@ -1,7 +1,5 @@
-7DRL
-====
-
-(This page is WIP)
+A Little Anxious When It's Dark
+===============================
 
 Made for the [7 Day Roguelike Challenge 2011](http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Contest_2011).
 
@@ -9,7 +7,7 @@ The game is played inside a web browser and requires [WebGL](http://www.khronos.
 
 The game is located in the subdirectory called [game](game/).
 
-Note that running the game locally will not probably work. You need a webserver to answer the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely).
+Note that running the game locally will not probably work. You need a webserver to answer the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely). And yes, I do want shaders in separate files for syntax highlighting and other reasons.
 
 
 Gameplay features
@@ -29,4 +27,8 @@ Graphical/engine features
 * Multiple light sources
 * Normalmapping
 * Does not depend on external engines/frameworks (i.e. custom built)
+
+Licensing stuff
+---------------
+The starting point for this game was a wonderful WebGL tutorial by Giles Thomas @ [learningwebgl.com](http://learningwebgl.com). The content there is licensed [Creative Commons Attribution/Share-Alike license](http://creativecommons.org/licenses/by-sa/3.0/). There are only few small bits left from the original tutorial code, but to avoid pain with licensing jungle, I'll release this for the time being under the same CC-BY-SA license (even though it's not really a software license), with attribution to here and learningwebgl.com.
 

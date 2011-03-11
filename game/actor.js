@@ -97,6 +97,8 @@ function Actor(type, pos, texture) {
 	this.attack = function(opponent) {
 		var dmg = this.rightHand.damage();
 		opponent.condition -= dmg;
+		splatters.push(new Actor("splatter", opponent.pos));
+		splatters[splatters.length-1].condition = new Date().getTime();
 		if (this.type == "player")
 			addMessage("You hit "+opponent.type+" by "+dmg+"!");
 		else if (opponent.type == "player")
