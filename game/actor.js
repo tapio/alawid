@@ -39,23 +39,23 @@ function Actor(type, pos, texture) {
 	this.moving = false;
 	this.condition = 100.0;
 	if (type == "player") {
-		this.rightHand = new Weapon("sword", [2, 1, 6]);
+		this.rightHand = new Weapon("sword", [2, 2, 7]);
 		this.leftHand = "torch";
 		this.torch = torchMaxTime;
 		this.torches = 3;
 		this.potions = 1;
 	} else if (type == "rat") {
-		this.rightHand = new Weapon("teeth", [1, 1, 4]);
+		this.rightHand = new Weapon("teeth", [1, 1, 5]);
 		this.condition = 40;
 	} else if (type == "kobold") {
-		this.rightHand = new Weapon("spear", [1, 1, 6]);
+		this.rightHand = new Weapon("spear", [1, 1, 8]);
 		this.condition = 55;
 	} else if (type == "goblin") {
 		this.condition = 70;
-		this.rightHand = new Weapon("crude sword", [2, 1, 4]);
+		this.rightHand = new Weapon("crude sword", [2, 1, 6]);
 	} else if (type == "dragon") {
 		this.condition = 200;
-		this.rightHand = new Weapon("fire breath", [3, 4, 7]);
+		this.rightHand = new Weapon("fire breath", [3, 5, 10]);
 	}
 
 	this.buffer = new VertexBuffer(SQUARE_VERTICES, SQUARE_TEXCOORDS, SQUARE_INDICES);
@@ -72,7 +72,7 @@ function Actor(type, pos, texture) {
 		if (this.dead() || this.moving) return;
 		var dx = Math.round(player.target[0]) - Math.round(this.pos[0]);
 		var dy = Math.round(player.target[1]) - Math.round(this.pos[1]);
-		var seeDist = (this.type == "dragon" ? 7 : 3);
+		var seeDist = (this.type == "dragon" ? 5 : 3);
 		if (player.leftHand == "torch") ++seeDist;
 		if (Math.max(Math.abs(dx), Math.abs(dy)) < seeDist) {
 			if (this.type == "rat" && player.leftHand == "torch"
@@ -86,7 +86,7 @@ function Actor(type, pos, texture) {
 				dx = sign(dx);
 				dy = sign(dy);
 			}
-		} else {
+		} else if (this.type != "dragon") { // Dragon doesn't wander around
 			// Wander aimlessly
 			dx = rand(-1, 1);
 			dy = rand(-1, 1);

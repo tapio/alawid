@@ -52,9 +52,9 @@
 	const lastLevel = 5;
 
 	function nextLevel() {
-		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 6), 0];
-		const kobolds = [0          , rand( 7,10), rand( 7,10), rand(10,12), 0];
-		const goblins = [0          ,           0, rand( 8,10), rand(10,12), 0];
+		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 6), rand(1,3)];
+		const kobolds = [0          , rand( 7,10), rand( 7,10), rand(10,12),         0];
+		const goblins = [0          ,           0, rand( 8,10), rand(10,12),         0];
 
 		monsters = []; items = []; lights = [];
 		++level;
