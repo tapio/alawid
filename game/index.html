@@ -332,6 +332,7 @@
 
 	function end() {
 		$("game").style.display = "none";
+		$("dielevel").innerHTML = level;
 		$("killcount-win").innerHTML = killCount;
 		$("killcount-lose").innerHTML = killCount;
 		window.clearInterval(secondTimer);
@@ -424,7 +425,8 @@
 		<form>
 			<input type="button" value="Try again" onClick="window.location.reload()">
 		</form>
-		<p>You killed <span id="killcount-lose">0</span> monsters.</p>
+		<p>You perished on level <span id="dielevel">0</span>,
+		after killing <span id="killcount-lose">0</span> monsters.</p>
 	</section>
 	<section id="win" style="display: none;">
 		<h1>You won!</h1>
