@@ -280,7 +280,14 @@ function setLightUniforms() {
 		return player.distance(a.position) - player.distance(b.position);
 	}
 
-	if (lightCount < lights.length) lights.sort(sortLights);
+	if (lightCount < lights.length) {
+		// Player's torch jiggles, so we make artificially
+		// sure that it is the closest one.
+		var torchpos = vec3.create(lights[0].position);
+		lights[0].position = player.pos;
+		lights.sort(sortLights);
+		lights[0].position = torchpos;
+	}
 	gl.uniform1i(curProg.specialLightIndexUniform, -1);
 
 	var position = [], attenuation = [];
