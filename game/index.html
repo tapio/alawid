@@ -68,8 +68,17 @@
 		world = new World();
 		// Last level
 		if (level == lastLevel) {
-			items.push(new Actor("treasure", world.map.findEmpty()));
-			monsters.push(new Actor("dragon", items[items.length-1].pos));
+			var loc;
+			while (true) {
+				// Find a far away location for the treasure
+				loc = world.map.findEmpty();
+				if (gridDistance(loc, [world.map.startx, world.map.starty])
+					> Math.max(world.map.width(), world.map.height()) * 0.5)
+						break;
+			}
+			items.push(new Actor("treasure", loc));
+			monsters.push(new Actor("dragon", loc));
+
 		}
 		// Monsters
 		for (var i = 0; i < rats[level-1]; ++i)
