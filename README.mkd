@@ -5,9 +5,9 @@ Made for the [7 Day Roguelike Challenge 2011](http://roguebasin.roguelikedevelop
 
 The game is played inside a web browser and requires [WebGL](http://www.khronos.org/webgl/) support, so you need a rather new browser (e.g. Google Chrome 9+ or Firefox 4 - IE won't work). Also, your graphics card needs to be at least OpenGL 2 capable (with decent drivers) for WebGL to work. You can check supported browsers and other notes in [Khrono's WebGL Wiki](http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation).
 
-Start playing by navigating into the [game](game/) subdirectory.
+**Start playing by navigating into the [game](game/) subdirectory.**
 
-You can download the JavaScript/HTML5/CSS3/GLSL sources from [github](https://github.com/tapio/alawid), but note that running the game locally will not probably work. You need a webserver to answer the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely). And yes, I do want shaders in separate files for syntax highlighting and other reasons.
+You can also download the JavaScript/HTML5/CSS3/GLSL sources from [github](https://github.com/tapio/alawid), but note that running the game locally will not probably work. You need a webserver to answer the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely). And yes, I do want shaders in separate files for syntax highlighting and other reasons.
 
 
 Gameplay features
