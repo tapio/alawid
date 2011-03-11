@@ -29,6 +29,14 @@ function Weapon(name, damage) {
 	}
 }
 
+function monsterAt(pos) {
+	for (var i = 0; i < monsters.length; ++i) {
+		if (!monsters[i].dead() && matchPos(monsters[i].target, pos))
+			return monsters[i];
+	}
+	return null;
+}
+
 const torchMaxTime = 40;
 
 function Actor(type, pos, texture) {
@@ -39,23 +47,23 @@ function Actor(type, pos, texture) {
 	this.moving = false;
 	this.condition = 100.0;
 	if (type == "player") {
-		this.rightHand = new Weapon("sword", [2, 1, 6]);
+		this.rightHand = new Weapon("sword", [2, 2, 7]);
 		this.leftHand = "torch";
 		this.torch = torchMaxTime;
 		this.torches = 3;
 		this.potions = 1;
 	} else if (type == "rat") {
-		this.rightHand = new Weapon("teeth", [1, 1, 4]);
+		this.rightHand = new Weapon("teeth", [1, 1, 5]);
 		this.condition = 40;
 	} else if (type == "kobold") {
-		this.rightHand = new Weapon("spear", [1, 1, 6]);
+		this.rightHand = new Weapon("spear", [1, 1, 8]);
 		this.condition = 55;
 	} else if (type == "goblin") {
 		this.condition = 70;
-		this.rightHand = new Weapon("crude sword", [2, 1, 4]);
+		this.rightHand = new Weapon("crude sword", [2, 1, 6]);
 	} else if (type == "dragon") {
 		this.condition = 200;
-		this.rightHand = new Weapon("fire breath", [3, 4, 7]);
+		this.rightHand = new Weapon("fire breath", [3, 5, 10]);
 	}
 
 	this.buffer = new VertexBuffer(SQUARE_VERTICES, SQUARE_TEXCOORDS, SQUARE_INDICES);
@@ -72,7 +80,7 @@ function Actor(type, pos, texture) {
 		if (this.dead() || this.moving) return;
 		var dx = Math.round(player.target[0]) - Math.round(this.pos[0]);
 		var dy = Math.round(player.target[1]) - Math.round(this.pos[1]);
-		var seeDist = (this.type == "dragon" ? 7 : 3);
+		var seeDist = (this.type == "dragon" ? 5 : 3);
 		if (player.leftHand == "torch") ++seeDist;
 		if (Math.max(Math.abs(dx), Math.abs(dy)) < seeDist) {
 			if (this.type == "rat" && player.leftHand == "torch"
@@ -86,11 +94,28 @@ function Actor(type, pos, texture) {
 				dx = sign(dx);
 				dy = sign(dy);
 			}
-		} else {
+		} else if (this.type != "dragon") { // Dragon doesn't wander around
 			// Wander aimlessly
 			dx = rand(-1, 1);
 			dy = rand(-1, 1);
+		} else return;
+
+		// Check if wall and slide if needed
+		if (dx && dy && world.map.isWall([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]])) {
+			// Try horizontal
+			if (!world.map.isWall([this.pos[0]+dx, this.pos[1], this.pos[2]])
+				&& !monsterAt([this.pos[0]+dx, this.pos[1], this.pos[2]]))
+			{
+				dy = 0;
+			// Try vertical
+			} else if (!world.map.isWall([this.pos[0], this.pos[1]+dy, this.pos[2]])
+				&& !monsterAt([this.pos[0], this.pos[1]+dy, this.pos[2]]))
+			{
+				dx = 0;
+			}
 		}
+
+		// Move
 		this.move([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
 	}
 
@@ -122,14 +147,11 @@ function Actor(type, pos, texture) {
 			}
 		}
 		// Collisions to monsters
-		for (var i = 0; i < monsters.length; ++i) {
-			if (this != monsters[i] && !monsters[i].dead()) {
-				if (matchPos(monsters[i].target, target)) {
-					if (this.type == "player") // Attack
-						this.attack(monsters[i])
-					return true;
-				}
-			}
+		var mon = monsterAt(target);
+		if (mon) {
+			if (this.type == "player") // Attack
+				this.attack(mon)
+			return true;
 		}
 		// Collision to items
 		if (this.type == "player") {

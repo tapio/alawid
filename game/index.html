@@ -52,9 +52,9 @@
 	const lastLevel = 5;
 
 	function nextLevel() {
-		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 6), 0];
-		const kobolds = [0          , rand( 7,10), rand( 7,10), rand(10,12), 0];
-		const goblins = [0          ,           0, rand( 8,10), rand(10,12), 0];
+		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 6), rand(1,3)];
+		const kobolds = [0          , rand( 7,10), rand( 7,10), rand(10,12),         0];
+		const goblins = [0          ,           0, rand( 8,10), rand(10,12),         0];
 
 		monsters = []; items = []; lights = [];
 		++level;
@@ -68,8 +68,17 @@
 		world = new World();
 		// Last level
 		if (level == lastLevel) {
-			items.push(new Actor("treasure", world.map.findEmpty()));
-			monsters.push(new Actor("dragon", items[items.length-1].pos));
+			var loc;
+			while (true) {
+				// Find a far away location for the treasure
+				loc = world.map.findEmpty();
+				if (gridDistance(loc, [world.map.startx, world.map.starty])
+					> Math.max(world.map.width(), world.map.height()) * 0.5)
+						break;
+			}
+			items.push(new Actor("treasure", loc));
+			monsters.push(new Actor("dragon", loc));
+
 		}
 		// Monsters
 		for (var i = 0; i < rats[level-1]; ++i)
@@ -323,6 +332,7 @@
 
 	function end() {
 		$("game").style.display = "none";
+		$("dielevel").innerHTML = level;
 		$("killcount-win").innerHTML = killCount;
 		$("killcount-lose").innerHTML = killCount;
 		window.clearInterval(secondTimer);
@@ -368,7 +378,7 @@
 
 		document.onkeydown = handleKeyDown;
 		document.onkeyup = handleKeyUp;
-level = 4;
+
 		player = new Actor("player");
 		nextLevel();
 
@@ -415,7 +425,8 @@ level = 4;
 		<form>
 			<input type="button" value="Try again" onClick="window.location.reload()">
 		</form>
-		<p>You killed <span id="killcount-lose">0</span> monsters.</p>
+		<p>You perished on level <span id="dielevel">0</span>,
+		after killing <span id="killcount-lose">0</span> monsters.</p>
 	</section>
 	<section id="win" style="display: none;">
 		<h1>You won!</h1>

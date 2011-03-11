@@ -330,6 +330,13 @@ function matchPos(p1, p2) {
 		&& Math.round(p1[1]) == Math.round(p2[1]);
 }
 
+function gridDistance(p1, p2) {
+	return Math.max(
+		Math.abs(Math.round(p1[0]) - Math.round(p2[0])),
+		Math.abs(Math.round(p1[1]) - Math.round(p2[1]))
+		);
+}
+
 function fract(num) {
 	return num - Math.floor(num);
 }
