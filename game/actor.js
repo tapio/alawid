@@ -90,7 +90,7 @@ function Actor(type, pos, texture) {
 			// Wander aimlessly
 			dx = rand(-1, 1);
 			dy = rand(-1, 1);
-		}
+		} else return;
 		this.move([this.pos[0]+dx, this.pos[1]+dy, this.pos[2]]);
 	}
 
