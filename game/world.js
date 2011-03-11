@@ -25,7 +25,7 @@ function DungeonMap(w, h) {
 		while (true) {
 			x = rand(1, this.width()-2);
 			y = rand(1, this.height()-2);
-			if (this.levelData[y][x] != "#" && this.levelData[y][x] != "+")
+			if (this.levelData[y][x] == " " || this.levelData[y][x] == "*")
 				return vec3.create([x, y, 0.0]);
 		}
 	}
@@ -99,20 +99,33 @@ function DungeonMap(w, h) {
 				++i;
 			}
 		}
-		// Pick exit
+		// Loop until start and exit are far apart
 		while (true) {
-			var i = rand(1, this.width()-2);
-			var j = rand(1, this.height()-2);
-			if (this.levelData[j][i] == "#") {
-				var wallCount = 0;
-				if (this.levelData[j-1][i] == "#") ++wallCount;
-				if (this.levelData[j+1][i] == "#") ++wallCount;
-				if (this.levelData[j][i-1] == "#") ++wallCount;
-				if (this.levelData[j][i+1] == "#") ++wallCount;
-				if (wallCount == 3) {
-					this.levelData[j][i] = "X";
-					break;
+			// Pick exit
+			var exitpos;
+			while (true) {
+				var i = rand(1, this.width()-2);
+				var j = rand(1, this.height()-2);
+				if (this.levelData[j][i] == "#") {
+					var wallCount = 0;
+					if (this.levelData[j-1][i] == "#") ++wallCount;
+					if (this.levelData[j+1][i] == "#") ++wallCount;
+					if (this.levelData[j][i-1] == "#") ++wallCount;
+					if (this.levelData[j][i+1] == "#") ++wallCount;
+					if (wallCount == 3) {
+						exitpos = [i, j];
+						break;
+					}
 				}
+			}
+			// Pick start
+			var startpos = this.findEmpty();
+			// Check distance
+			if (Math.max(Math.abs(startpos[0]-exitpos[0]), Math.abs(startpos[1]-exitpos[1])) > Math.max(w,h) * 0.7) {
+				this.startx = startpos[0];
+				this.starty = startpos[1];
+				this.levelData[exitpos[1]][exitpos[0]] = "X";
+				break;
 			}
 		}
 	}
