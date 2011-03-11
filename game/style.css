@@ -20,6 +20,7 @@ h2 {
 
 p {
 	font-size: 16px;
+	text-align: center;
 }
 
 .uitext {
@@ -91,7 +92,7 @@ header {
 	text-align: center;
 }
 
-#gameover, #win { height: 500px; }
+#gameover, #win { color: gray; height: 500px; }
 #gameover h1 { color: #f00; }
 #win h1 { color: #080; }
 

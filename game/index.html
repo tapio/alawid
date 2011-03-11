@@ -48,6 +48,7 @@
 	var items = [];
 	var splatters = [];
 	var level = 0;
+	var killCount = 0;
 
 	function nextLevel() {
 		const rats    = [rand(12,15), rand(10,15), rand( 5, 7), rand( 5, 7), 0];
@@ -164,8 +165,8 @@
 		if (player.dead()) return;
 		// First person mode looking
 		if (cameraFirstPerson) {
-			if (pressedKeys[37] || pressedKeys[65]) cameraAngle += 0.05; // Left cursor key or A
-			else if (pressedKeys[39] || pressedKeys[68]) cameraAngle -= 0.05; // Right cursor key or D
+			if (pressedKeys[37] || pressedKeys[65] || pressedKeys[100]) cameraAngle += 0.05; // Left cursor key or A
+			else if (pressedKeys[39] || pressedKeys[68] || pressedKeys[102]) cameraAngle -= 0.05; // Right cursor key or D
 		}
 	}
 
@@ -239,7 +240,10 @@
 
 		for (var i = monsters.length-1; i >= 0; --i) {
 			monsters[i].updateMoving();
-			if (monsters[i].dead()) monsters.splice(i, 1); // Remove dead monsters
+			if (monsters[i].dead()) {
+				monsters.splice(i, 1); // Remove dead monsters
+				++killCount;
+			}
 		}
 		for (var i = items.length-1; i >= 0; --i) {
 			if (items[i].dead()) items.splice(i, 1); // Remove dead items
@@ -310,6 +314,8 @@
 
 	function end() {
 		$("game").style.display = "none";
+		$("killcount-win").innerHTML = killCount;
+		$("killcount-lose").innerHTML = killCount;
 		window.clearInterval(secondTimer);
 		secondTimer = undefined;
 	}
@@ -389,6 +395,7 @@
 		<form>
 			<input type="button" value="Try again" onClick="window.location.reload()">
 		</form>
+		<p>You killed <span id="killcount-lose">0</span> monsters.</p>
 	</section>
 	<section id="win" style="display: none;">
 		<h1>You won!</h1>
@@ -396,6 +403,7 @@
 		<form>
 			<input type="button" value="Now do it again." onClick="window.location.reload()">
 		</form>
+		<p>You killed <span id="killcount-win">0</span> monsters.</p>
 	</section>
 	<section id="messagesbox" class="infobox">
 		<h3>Messages</h3>
