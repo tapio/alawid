@@ -95,6 +95,10 @@
 	function handleKeyDown(event) {
 		pressedKeys[event.keyCode] = true;
 
+		// Start game
+		if ($("titlescreen").style.display != 'none')
+			$("titlescreen").style.display = 'none';
+
 		// Help
 		if (event.keyCode == 72) {
 			$("help").style.display = ($("help").style.display != 'none' ? 'none' : '');
@@ -304,7 +308,7 @@
 		$("fps").innerHTML = frameCounter;
 		frameCounter = 0;
 		// Handle player torch
-		if (player.leftHand == "torch") {
+		if (player.leftHand == "torch" && $("titlescreen").style.display == 'none') {
 			player.torch -= 1.0;
 			if (player.torch <= 0) {
 				player.leftHand = null;
@@ -365,8 +369,8 @@
 		player = new Actor("player");
 		nextLevel();
 
-		secondTimer = window.setInterval("doEachSecond()", 1000);
 		addMessage("Welcome.");
+		secondTimer = window.setInterval("doEachSecond()", 1000);
 		tick();
 	}
 
@@ -384,6 +388,17 @@
 	<section id="game">
 		<canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
 		<div id="mapoverlay" class="infobox" style="display: none;"></div>
+		<div id="titlescreen" class="infobox">
+			<h1>An adventure is about to begin!</h1>
+			<p>Descend to the dungeon full of <strong>monsters</strong> and search for the
+			hidden <strong>treasure</strong> that awaits its discoverer. A mysterious
+			<strong>portal</strong> will take you to the next level, but you might want to
+			find and pick up some <strong>supplies</strong> first. It also might be a good
+			idea to avoid excess monster hunting - that'll get you killed eventually.
+			<strong>Sneaking</strong> around enemies just might keep you alive long enough
+			to see the treasure.</p>
+			<p><em>Press any key to begin!</em></p>
+		</div>
 		<p>
 		<span class="uitext"><span class="healthlabel">Health:</span> <span id="health">100%</span></span>
 		<span class="uitext"><span class="torchlabel">Torch:</span> <span id="torch">100s</span></span>

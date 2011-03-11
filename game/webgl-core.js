@@ -268,7 +268,7 @@ function PointLight(position, diffuse, attenuation, specular) {
 	this.diffuse = diffuse || vec3.create([0.9, 0.6, 0.1]);
 	this.attenuation = attenuation || vec3.create([0.0, 0.0, 2.0]);
 	this.specular = specular || vec3.create([1.0, 0.7, 0.2]);
-	// NOTE: specular color is hard-coded to shaders and diffuse is global
+	// NOTE: specular and diffuse color are hard-coded to shaders
 	// due to nasty limits in varyings/uniforms
 }
 
