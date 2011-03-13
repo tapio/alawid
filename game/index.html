@@ -127,7 +127,7 @@
 			el.style.display = (el.style.display != 'none' ? 'none' : '');
 		}
 		// Rest available only when player is alive
-		if (player.dead() && secondTimer) return;
+		if (player.dead() && secondTimer) return false;
 
 		// Movement
 		if (!player.moving && !cameraFirstPerson) {
@@ -173,10 +173,13 @@
 			cameraHeight = Math.max(cameraHeight - 0.5, cameraMinHeight);
 		else if (event.keyCode == 109 || event.keyCode == 189)
 			cameraHeight = Math.min(cameraHeight + 0.5, cameraMaxHeight);
+
+		return false;
 	}
 
 	function handleKeyUp(event) {
 		pressedKeys[event.keyCode] = false;
+		return false;
 	}
 
 	function handleKeys() {
