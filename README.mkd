@@ -33,6 +33,10 @@ Graphical/engine features
 * Does not depend on external engines/frameworks (i.e. custom built)
 * CSS3/HTML5 based "HUD"
 
+Postmortem
+----------
+If you are interested, you can read how the 7-day development went and other retrospective notes [here](postmortem/).
+
 Licensing stuff
 ---------------
 The starting point for this game was a wonderful WebGL tutorial by Giles Thomas @ [learningwebgl.com](http://learningwebgl.com). The content there is licensed [Creative Commons Attribution/Share-Alike license](http://creativecommons.org/licenses/by-sa/3.0/). There are only few small bits left from the original tutorial code, but to avoid pain with licensing jungle, I'll release this for the time being under the same CC-BY-SA license (even though it's not really a software license), with attribution to here and learningwebgl.com.
