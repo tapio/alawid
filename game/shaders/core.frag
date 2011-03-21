@@ -48,7 +48,8 @@ void main(void) {
 
 		// Attenuation
 		float attenuation = 1.0;
-		float dist = distance(uLightPositions[i], vPosition.xyz);
+		// We use length() instead of distance() because of a bug in some ATI cards/drivers
+		float dist = length(uLightPositions[i] - vPosition.xyz);
 		if (dist != 0.0) {
 			attenuation = clamp(
 				1.0 / (
