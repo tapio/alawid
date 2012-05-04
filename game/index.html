@@ -174,7 +174,9 @@
 		else if (event.keyCode == 109 || event.keyCode == 189)
 			cameraHeight = Math.min(cameraHeight + 0.5, cameraMaxHeight);
 
-		return false;
+		if (pressedKeys[17] || pressedKeys[18]) // CTRL/ALT for browser hotkeys
+			return true;
+		else return false;
 	}
 
 	function handleKeyUp(event) {
