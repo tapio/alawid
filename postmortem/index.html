@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>A Little Anxious When It's Dark - A WebGL 7DRL</title>
+
+	<style type="text/css">
+		body {
+			margin-top: 1.0em;
+			background-color: #000000;
+			font-family: "Helvetica,Arial,FreeSans";
+			color: #dddddd;
+		}
+		#container {
+			margin: 0 auto;
+			width: 700px;
+		}
+		h1 { font-size: 3.0em; color: #0a0; margin-bottom: 50px; }
+		h1 .small { font-size: 0.4em; }
+		h1 a { text-decoration: none }
+		h2 { font-size: 1.5em; color: #800; }
+		h3 { color: #800; }
+		a { color: #cb66ff; }
+		.description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+		img { border: 0; }
+		.sqrthumb { width: 256px; height: 256px; }
+		.download { float: right; }
+		pre { background: #222; border: 2px solid green; color: #080; padding: 15px;}
+		hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+		.footer { text-align:center; padding-top:30px; font-style: italic; }
+	</style>
+
+</head>
+
+<body>
+	<a href="http://github.com/tapio/alawid"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+	<div id="container">
+
+		<h1>Postmortem</h1>
+		<p>Here I shall go quickly through the 7-day development of <em>A Little Anxious When It's Dark</em> and explain what I think was particularly succesful and what was not.</p>
+		
+		<h2>Inception</h2>
+		<p>I had a vague idea that for my 2011 7DRL challenge entry I wanted to create a roguelike that would utilize OpenGL for creating some nice lighting effects as well as render the scene in 3D, although still from a top-down perspective. A few days before the challenge I took interest in WebGL, the brand new standard bringing hardware accelerated OpenGL ES 2.0 to web browsers without any plug-ins. I didn't know much JavaScript (which is what is used for accessing WebGL), but after I spent a day messing around with some tutorials from learningwebgl.com, I realized this could very well work!</p>
+		
+		<h2>Getting an @ to move on the screen</h2>
+		<p>I started the challenge on Saturday, March 5th at 15:15. My starting point was a tutorial code that I had modified rather heavily underneath, but on the outside it was still a spinning box type of thing. I created a very simple hard-coded map and rendered it using a single quad with texture repeat for floor and cubes as walls. I had some difficulties with coordinate systems and other stuff, but I finally got the @ moving as seen in the picture below.</p>
+		
+		<a href="pics/01-floor-and-walls.png"><img class="sqrthumb" src="pics/01-floor-and-walls.png" alt="Floor and walls" /></a>
+		
+		<h2>I'm on to something...</h2>
+		<p>The basic moving @ actually took me a bit more time than I had anticipated, but after that point, the development got much more fun. Next up was adding some lighting, other than global ambient light. At first I used single point light that was attached to the player character. It took quite some time to get that working properly, but afterwards it wasn't a big task to create a system for handling multiple lights. By changing the light color to warm yellow, I got the picture below and realized I was definitely on to something...</p>
+		
+		<a href="pics/02-lights.png"><img class="sqrthumb" src="pics/02-lights.png" alt="Lights" /></a>
+		
+		<p>I then decided to implement normal mapping to create some bumps on the flat surfaces. This turned out to be the single most difficult and time consuming task involving a lot of research and several shader rewrites. Once I got it working, I was very happy, although the visual results were rather marginal, especially for a still image as you can see below. Later on I quickly hacked a first-person mode where the normal mapping in the walls looks really cool with moving lights. In retrospect, perhaps the most important task of the normal mapping is to make the player character, monsters and items look 3D instead of boringly flat.</p>
+		
+		<a href="pics/03-normalmapping.png"><img class="sqrthumb" src="pics/03-normalmapping.png" alt="Normal mapping" /></a> &nbsp;&nbsp;
+		<a href="pics/05-first-person-mode.png"><img class="sqrthumb" src="pics/05-first-person-mode.png" alt="First-person mode" /></a>
+		
+		<p>I had already decided to make the walls taller than camera height, eliminating the need for FOV algorithms and light-bleeding countering shadowing calculations. The last big feature for the engine was to add some variance to the walls, i.e. break the straight lines. Result is shown below. This made the dungeon look rather nice to my eyes so that I could turn my attention to the actual gameplay.</p>
+		
+		<a href="pics/04-uneven-walls.png"><img class="sqrthumb" src="pics/04-uneven-walls.png" alt="Uneven walls" /></a>
+		
+		<h2>Gameplay</h2>
+		<p>I had no big ambitions towards the gameplay and in fact, not very clear visions either. So I just started to build up the core features: monsters, fighting, AI and items. I ended up with a very few types of enemies and even fewer items, but I feel that they suffice. With regards to dungeon generation, I didn't really spend much time with it, simply porting an old "place-a-room-connect-with-previous-one-repeat" generator of mine to JavaScript. The results are not breath-taking, but adequete nevertheless. Along the road, the user interface around the dungeon view evolved and eventually I also got level transitions, an ending and a background story (if you can call a couple of sentences that). There were also improvements to the engine and other nice stuff - I've gathered some of these later stage development pictures below.</p>
+	
+		<a href="pics/06-map-overlay.png"><img style="width: 300px; height: 180px;" src="pics/06-map-overlay.png" alt="Map overlay" /></a> &nbsp; &nbsp;
+		<a href="pics/07-interface.png"><img style="width: 300px; height: 180px;" src="pics/07-interface.png" alt="Interface" /></a><br/>
+		<a href="pics/08-portal.png"><img style="width: 300px; height: 300px;" src="pics/08-portal.png" alt="Portal" /></a> &nbsp; &nbsp;
+		<a href="pics/09-splatter.png"><img style="width: 300px; height: 220px;" src="pics/09-splatter.png" alt="Blood splatter" /></a><br/>
+		
+		<h2>Conclusion</h2>
+		
+		<h3>What went right</h3>
+		<ul>
+		<li>I like the visuals: lighting, textures, dungeon appearance etc.</li>
+		<li>It's "complete", i.e. a whole game albeit a small one.</li>
+		<li>It got me familiar with WebGL.</li>
+		<li>I think it's fun to play.</li>
+		</ul>
+		
+		<h3>Room for improvement</h3>
+		<ul>
+		<li>Shallow gameplay-wise: e.g. only two items and no real inventory.</li>
+		<li>In retrospect, an experience / level-up system would have been nice.</li>
+		<li>Does not work for everybody.</li>
+		</ul>
+
+		<p>All in all, I'm very happy with the results and consider this a personal triumph (which creates some pressure for the next year's 7DRL challenge as I was already very pleased with my last year's entry, <a href="http://tapio.github.com/cotc/">City of the Condemned</a>).</p>
+
+		<div class="footer">
+			back to <a href="http://tapio.github.com/alawid">main page</a>
+		</div>
+
+	</div>
+
+
+</body>
+</html>

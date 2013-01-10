@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>A Little Anxious When It's Dark - A WebGL 7DRL</title>
+
+	<style type="text/css">
+		body {
+			margin-top: 1.0em;
+			background-color: #000000;
+			font-family: "Helvetica,Arial,FreeSans";
+			color: #dddddd;
+		}
+		#container {
+			margin: 0 auto;
+			width: 700px;
+		}
+		h1 { font-size: 3.0em; color: #0a0; margin-bottom: 50px; }
+		h1 .small { font-size: 0.4em; }
+		h1 a { text-decoration: none }
+		h2 { font-size: 1.5em; color: #800; }
+		h3 { text-align: center; color: #800; }
+		a { color: #cb66ff; }
+		.description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+		img { border: 0; }
+		.download { float: right; }
+		pre { background: #222; border: 2px solid green; color: #080; padding: 15px;}
+		hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+		.footer { text-align:center; padding-top:30px; font-style: italic; }
+	</style>
+
+</head>
+
+<body>
+	<a href="http://github.com/tapio/alawid"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+	<div id="container">
+
+		<!-- content.html -->
+<h1>A Little Anxious When It's Dark</h1>
+
+<p><img src="screenshot.png" alt="Screenshot" title="A rat trying to kill me before I reach the portal." /></p>
+
+<p>Made for the <a href="http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Contest_2011">7 Day Roguelike Challenge 2011</a>, this is a short coffee-break <a href="http://en.wikipedia.org/wiki/Roguelike">roguelike</a>, where you search for a treasure through five randomly generated dungeon levels.</p>
+
+<p>The game is played inside a web browser and requires <a href="http://www.khronos.org/webgl/">WebGL</a> support, so you need a rather new browser (e.g. Google Chrome 9+ or Firefox 4 - IE won't work). Also, your graphics card needs to be at least OpenGL 2 capable (with decent drivers) for WebGL to work. You can check supported browsers and other notes in <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">Khrono's WebGL Wiki</a>.</p>
+
+<p><strong>Start playing by navigating into the <a href="game/">game</a> subdirectory.</strong></p>
+
+<p>You can also download the JavaScript/HTML5/CSS3/GLSL sources from <a href="https://github.com/tapio/alawid">github</a>, but note that running the game locally will not probably work. You need a webserver to answer the XMLHttpRequests that are used for loading shaders from dedicated files (or at least that is the explanation I thought the most likely). And yes, I do want shaders in separate files for syntax highlighting and other reasons.</p>
+
+<h2>Gameplay features</h2>
+
+<ol>
+<li>Collect and use torches to light up your journey</li>
+<li>Fight multiple enemy types</li>
+<li>Collect and use health potions to recover from injuries</li>
+<li>Use portals to travel to the next level</li>
+<li>Find the treasure</li>
+<li>Profit</li>
+</ol>
+
+<h2>Graphical/engine features</h2>
+
+<ul>
+<li>Mesh generation based on ASCII map</li>
+<li>Automatic normal and tangent calculations for arbitrary triangle mesh</li>
+<li>Per-pixel lighting</li>
+<li>Multiple light sources</li>
+<li>Normalmapping</li>
+<li>Does not depend on external engines/frameworks (i.e. custom built)</li>
+<li>CSS3/HTML5 based "HUD"</li>
+</ul>
+
+<h2>Postmortem</h2>
+
+<p>If you are interested, you can read how the 7-day development went and other retrospective notes <a href="postmortem/">here</a>.</p>
+
+<h2>Licensing stuff</h2>
+
+<p>The starting point for this game was a wonderful WebGL tutorial by Giles Thomas @ <a href="http://learningwebgl.com">learningwebgl.com</a>. The content there is licensed <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution/Share-Alike license</a>. There are only few small bits left from the original tutorial code, but to avoid pain with licensing jungle, I'll release this for the time being under the same CC-BY-SA license (even though it's not really a software license), with attribution to here and learningwebgl.com.</p>
+
+		<div class="footer">
+			get the source code on GitHub : <a href="http://github.com/tapio/alawid">tapio/alawid</a>
+		</div>
+
+	</div>
+
+
+</body>
+</html>

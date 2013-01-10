@@ -1,6 +1,8 @@
 A Little Anxious When It's Dark
 ===============================
 
+![Screenshot](screenshot.png "A rat trying to kill me before I reach the portal.")
+
 Made for the [7 Day Roguelike Challenge 2011](http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Contest_2011), this is a short coffee-break [roguelike](http://en.wikipedia.org/wiki/Roguelike), where you search for a treasure through five randomly generated dungeon levels.
 
 The game is played inside a web browser and requires [WebGL](http://www.khronos.org/webgl/) support, so you need a rather new browser (e.g. Google Chrome 9+ or Firefox 4 - IE won't work). Also, your graphics card needs to be at least OpenGL 2 capable (with decent drivers) for WebGL to work. You can check supported browsers and other notes in [Khrono's WebGL Wiki](http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation).
@@ -30,6 +32,10 @@ Graphical/engine features
 * Normalmapping
 * Does not depend on external engines/frameworks (i.e. custom built)
 * CSS3/HTML5 based "HUD"
+
+Postmortem
+----------
+If you are interested, you can read how the 7-day development went and other retrospective notes [here](postmortem/).
 
 Licensing stuff
 ---------------
