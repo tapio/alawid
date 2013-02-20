@@ -1,12 +1,15 @@
 // GL Initialization
 
 var gl;
+var anisoExt = null;
 
 function initGL(canvas) {
 	try {
 		gl = canvas.getContext("experimental-webgl");
 		gl.viewportWidth = canvas.width;
 		gl.viewportHeight = canvas.height;
+		anisoExt = gl.getExtension("EXT_texture_filter_anisotropic") || gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
+		if (!anisoExt) console.log("Anisotropic filtering not supported.");
 	} catch (e) { }
 	if (!gl) alert("Could not initialise WebGL :-(\nPerhaps your browser is too old or incompatible. You might also have poor graphics card.");
 }
@@ -84,6 +87,10 @@ function handleLoadedTexture(texture) {
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+	if (anisoExt) {
+		var maxAniso = gl.getParameter(anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+		gl.texParameterf(gl.TEXTURE_2D, anisoExt.TEXTURE_MAX_ANISOTROPY_EXT, maxAniso);
+	}
 	gl.generateMipmap(gl.TEXTURE_2D);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 }
