@@ -1,5 +1,6 @@
 #ifdef GL_ES
 precision highp float;
+precision highp int;
 #endif
 
 // MAX_LIGHTS is defined by calling code.

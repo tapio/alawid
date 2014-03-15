@@ -1,5 +1,9 @@
 // MAX_LIGHTS is defined by calling code.
 // Limit varying vectors to 8.
+#ifdef GL_ES
+precision highp float;
+precision highp int;
+#endif
 
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;
