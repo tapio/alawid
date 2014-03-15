@@ -175,13 +175,15 @@
 			cameraHeight = Math.min(cameraHeight + 0.5, cameraMaxHeight);
 
 		if (pressedKeys[17] || pressedKeys[18]) // CTRL/ALT for browser hotkeys
-			return true;
-		else return false;
+			return;
+		if (event.keyCode >= 112 && event.keyCode <= 123) // F1-F12
+			return;
+		event.preventDefault();
 	}
 
 	function handleKeyUp(event) {
 		pressedKeys[event.keyCode] = false;
-		return false;
+		event.preventDefault();
 	}
 
 	function handleKeys() {
